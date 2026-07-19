@@ -119,21 +119,37 @@ The design must support:
 - a player belonging to at most one team at a time;
 - registered player names being available for result presentation.
 
+### Locked-team rule
+
+Accepted behaviour:
+
+- before the match starts, players may choose Red or Blue;
+- when `Start Game` is pressed, both teams lock;
+- while teams are locked, new players may not join an active match;
+- while teams are locked, existing players may not switch teams;
+- a shared `Allow Team Switching` control can temporarily unlock team joining and switching during the active match;
+- only while that control is enabled may a new player join Red or Blue or an existing player change teams;
+- switching the control off locks both teams again;
+- the lock state is shared and must be visible to all players, including late joiners.
+
+The exact permission rule for who may operate `Allow Team Switching` is still open.
+
 ### Match flow
 
 Accepted direction:
 
 1. Players choose Red or Blue.
-2. A Start Game action begins one shared ten-minute match.
+2. A Start Game action begins one shared ten-minute match and locks both teams.
 3. The countdown is reconstructed from one synchronized network start time.
 4. Goals count only while the match is active.
 5. When the ball enters Red's goal, Blue receives one point.
 6. When the ball enters Blue's goal, Red receives one point.
 7. The changed score is serialized when a goal is accepted.
 8. Late joiners and rejoining players receive the current shared match state through synchronized variables and deserialization.
-9. Switching between Soccer and Soccer Hockey leaves the active match intact.
-10. A separate Reset Game action clears the match state when players choose to reset it.
-11. At time expiry, the winner is determined and presented with winner text, particles and cheering audio.
+9. A late joiner observes the current match but cannot join a locked team unless `Allow Team Switching` is enabled.
+10. Switching between Soccer and Soccer Hockey leaves the active match intact.
+11. A separate Reset Game action clears the match state when players choose to reset it.
+12. At time expiry, the winner is determined and presented with winner text, particles and cheering audio.
 
 ### Goal detection direction
 
@@ -159,10 +175,10 @@ This pattern is accepted as a design reference for the Sports Gym. A universal A
 The likely smallest safe architecture is:
 
 - `SportsModeManager` remains the truth for Soccer versus Soccer Hockey;
-- one future generic match manager becomes the independent truth for registration, teams, timer, score and result;
+- one future generic match manager becomes the independent truth for registration, teams, team-lock state, timer, score and result;
 - the match manager does not reset merely because the sport mode changes;
 - two goal detectors only report which goal was entered;
-- configurable action buttons request Join Red, Join Blue, Leave, Start Game and Reset Game;
+- configurable action buttons request Join Red, Join Blue, Leave, Start Game, Reset Game and Allow Team Switching;
 - scoreboard visuals only display manager state.
 
 This is still a proposed architecture, not permission to build it yet.
@@ -171,12 +187,13 @@ This is still a proposed architecture, not permission to build it yet.
 
 Decide this next before implementation:
 
-**May players change teams after joining, and if so, until what moment?**
+**Who is allowed to toggle `Allow Team Switching` during an active match?**
 
-Recommended simple rule:
+Small options to compare:
 
-- before the match: a player may switch by pressing the other team button;
-- once the match has started: team changes are locked until the match ends or is reset.
+- any registered player in either team;
+- only the player who started the match;
+- only instance master or a configured admin.
 
 Discuss only this question next.
 
@@ -192,6 +209,7 @@ After the current question is resolved, discuss one at a time:
 6. Exact winner text and how registered player names are shown.
 7. Whether team membership persists after a completed match.
 8. Whether Reset Game needs confirmation or restricted access.
+9. How the UI shows that teams are locked or temporarily open.
 
 ## Risks
 
@@ -199,7 +217,8 @@ After the current question is resolved, discuss one at a time:
 - Creating a second source of truth for the active sport mode.
 - Letting goal detectors keep independent scores.
 - Double-scoring while the ball remains in or bounces through a goal trigger.
-- Team switching during play making the winner list unreliable.
+- New players entering an active match without the current players deliberately opening the teams.
+- Unauthorized players repeatedly unlocking teams or disrupting the match.
 - Networking that fails for late joiners, rejoining players or after ownership changes.
 - Accidental resets by any player during an active match.
 - Turning the reusable button idea into an oversized framework before release.
@@ -209,8 +228,7 @@ After the current question is resolved, discuss one at a time:
 
 Answer only this design question:
 
-- may players switch between Red and Blue before the match starts;
-- and should team switching lock as soon as Start Game is pressed?
+Who may toggle `Allow Team Switching` during an active match?
 
 No Unity changes are needed for this step.
 
