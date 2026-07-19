@@ -109,3 +109,14 @@ When the countdown reaches zero and Red and Blue have equal scores, the timer st
 **Reason:** Stef prefers a decisive and exciting finish instead of a draw.
 
 **Boundary:** During sudden death, normal goal validation and anti-double-score protection still apply. The winner presentation plays only after the deciding goal is accepted.
+
+## D-015 — Shared announcement panel for match messages
+**Status:** Accepted
+
+The large extra text field above the scoreboard becomes the central announcement panel for important shared match messages. It can show countdown or phase messages, start warnings, validation errors, team-lock status, sudden death and the final winner.
+
+At normal time expiry, a buzzer plays. If the score is tied, the timer remains at `00:00` and the announcement panel shows `NEXT GOAL WINS`, preferably with a restrained blinking or pulsing effect until the deciding goal is accepted.
+
+**Reason:** Players should understand the current match state immediately without needing to know hidden rules.
+
+**Boundary:** The final list of messages, animation timing and audio clips will be defined during UI and implementation design.
