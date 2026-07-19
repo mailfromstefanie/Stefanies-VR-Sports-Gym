@@ -68,3 +68,36 @@ The manager-side team registration flow and `SportsMatchButton` actions work loc
 
 ### Next step
 Add the first minimal `SportsScoreboardView` that reads the manager and refreshes only the Red and Blue player-name texts.
+
+## 2026-07-19 — Minimal player-list view completed
+
+### Built
+- Added and connected `CURRENT_UNITY_STATE/SCRIPTS/SportsScoreboardView.cs`.
+- Connected one manager reference and the existing Red and Blue `PlayerNames` TMP texts.
+- Converted synchronized VRChat player IDs into current local display names.
+- Added a `SportsScoreboardView` reference to `SportsMatchManager`.
+- Centralized local refresh work in `RefreshLocalState()`.
+- The manager now refreshes debug values and the scoreboard view after startup, accepted Join/Leave changes, owner-side player cleanup and deserialization.
+
+### Performance choice
+- No `Update()` loop is used.
+- Player lists are rebuilt only after meaningful state events or when the view starts after its inactive root becomes active.
+- This keeps the view event-driven and avoids unnecessary per-frame work on Quest.
+
+### Unity and ClientSim test result
+- Both scripts compiled without red Console errors.
+- Join Red displayed `StefanieInVR` only under Red.
+- Join Blue removed the name from Red and displayed it only under Blue.
+- Leave Game cleared both lists.
+- The managers remained active while the sport-specific scoreboard root was inactive in Basketball mode.
+- Joining Red while that root was inactive and then switching to Soccer displayed the existing registration immediately when the view started.
+
+### Learned
+The button-manager-view chain works locally: buttons forward requests, the manager remains the only match truth, and the view redraws only from manager state. An inactive sport root does not lose registrations because the always-active manager retains the synchronized data.
+
+### Deliberately not built yet
+- No completed two-client synchronization test.
+- No score, timer, goals, reset confirmation, audio, particles or SoccerBox football changes.
+
+### Next step
+Run the first two-client synchronization test for Join Red, Join Blue, team switching and Leave Game without adding new match features.
