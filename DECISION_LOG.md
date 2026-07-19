@@ -107,3 +107,12 @@ Players remain registered in Red or Blue after a match finishes. Preparing a rem
 Players leave through `Leave Game` or change team only while team switching is allowed. A separate full cleanup may clear all registrations when the group deliberately wants new teams or when an abandoned board must be restored.
 
 **Reason:** The same group can start a rematch without everyone having to join again.
+
+## D-021 — Reset Game requires a second confirmation press
+**Status:** Accepted
+
+The first valid press of `Reset Game` shows `PRESS RESET AGAIN TO CONFIRM` and starts a confirmation window of about five seconds. The same player must press the button again within that window to perform the reset. Otherwise the pending confirmation expires without changing the match.
+
+When nobody is registered, any visitor may use the same two-press confirmation to restore an abandoned board. A different player cannot complete another player's pending confirmation.
+
+**Reason:** This prevents accidental resets while remaining reliable with ordinary Unity UI buttons in both VR and desktop mode.
