@@ -152,3 +152,14 @@ The manual Red and Blue plus/minus score controls cannot change the score while 
 Manual correction remains available before an official match and during normal timed play so players can fix an incorrect score.
 
 **Reason:** Sudden death must be decided on the field, not accidentally or deliberately through the scoreboard.
+
+## D-026 — Clear All Players uses its own self-confirming button
+**Status:** Accepted
+
+A separate `CLEAR ALL PLAYERS` action removes every registration from Red and Blue without being confused with the normal rematch reset.
+
+The action is available only while no match is active. On the first valid press, the same button changes its visible text to `PRESS AGAIN TO CONFIRM` for about five seconds. The same player must press that button again within the confirmation window. When the window expires, the button automatically returns to `CLEAR ALL PLAYERS` and nothing is changed.
+
+The shared announcement panel may simultaneously show `CLEAR ALL PLAYERS?` so the action is obvious to first-time VR users.
+
+**Reason:** Confirmation on the button that was already pressed is more intuitive than asking a visitor to find a second confirmation control. Keeping the action separate prevents `Reset Game` from unexpectedly deleting the teams.
