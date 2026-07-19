@@ -1,4 +1,4 @@
-﻿using UdonSharp;
+using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using TMPro;
@@ -26,14 +26,12 @@ namespace StefanieInVR
 
             if (redTeamText != null)
             {
-                redTeamText.text =
-                    BuildPlayerList(matchManager.GetRedPlayerIds());
+                redTeamText.text = BuildPlayerList(matchManager.GetRedPlayerIds());
             }
 
             if (blueTeamText != null)
             {
-                blueTeamText.text =
-                    BuildPlayerList(matchManager.GetBluePlayerIds());
+                blueTeamText.text = BuildPlayerList(matchManager.GetBluePlayerIds());
             }
         }
 
@@ -55,9 +53,7 @@ namespace StefanieInVR
                     continue;
                 }
 
-                VRCPlayerApi player =
-                    VRCPlayerApi.GetPlayerById(playerId);
-
+                VRCPlayerApi player = VRCPlayerApi.GetPlayerById(playerId);
                 if (player == null || !player.IsValid())
                 {
                     continue;
