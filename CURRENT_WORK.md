@@ -85,6 +85,14 @@ The winner presentation also uses:
 - particles for the winning team;
 - a message that remains visible until Reset Game.
 
+### Rematch and team persistence
+
+- Players remain registered in Red or Blue after the match result.
+- A normal rematch reset clears score, timer, sudden death, announcement and winner state.
+- A normal rematch reset does not clear the Red and Blue player lists.
+- Players leave through `Leave Game` or switch teams only while team switching is allowed.
+- A separate full cleanup may clear all registrations when the group deliberately wants new teams or an abandoned board must be restored.
+
 ## Existing scoreboard UI
 
 Stef has already created:
@@ -111,24 +119,27 @@ Proposed, not yet approved for implementation:
 
 ## Current design question
 
-**Should team membership remain after a match finishes, or should the players be removed from Red and Blue automatically?**
+**How should Reset Game be confirmed so an active match cannot be erased accidentally?**
 
 Recommended first-release rule:
 
-- keep the players registered after the result;
-- Reset Game clears score, timer and result but leaves the teams in place;
-- players can use Leave Game or switch teams before the next start.
+- first press shows `PRESS RESET AGAIN TO CONFIRM` in the announcement panel;
+- the same registered player must press Reset again within about five seconds;
+- otherwise the confirmation expires and nothing changes;
+- when nobody is registered, any visitor may use the same two-press confirmation to restore an abandoned board.
+
+This is simpler and more reliable for both desktop and VR than requiring a physical hold gesture through a normal Unity UI button.
 
 Discuss only this question next.
 
 ## Remaining open questions
 
-1. Exact Reset Game confirmation interaction.
-2. How the UI shows locked and open teams.
-3. Whether No Limit remains in the first release.
-4. Exact announcement timing for start and lock messages.
-5. Whether manual score correction is allowed during sudden death.
-6. Exact goal anti-double-score and ball-ownership implementation.
+1. How the UI shows locked and open teams.
+2. Whether No Limit remains in the first release.
+3. Exact announcement timing for start and lock messages.
+4. Whether manual score correction is allowed during sudden death.
+5. Exact goal anti-double-score and ball-ownership implementation.
+6. Whether full cleanup needs its own separate button or a long Reset confirmation.
 
 ## Do not do yet
 
