@@ -114,20 +114,26 @@ For every button action:
 6. The manager calls `RequestSerialization()` once after the complete change.
 7. The local and shared views then refresh from the manager state.
 
-This prevents partial updates, keeps one clear ownership target and avoids unnecessary ownership changes for invalid input.
+### Approved team registration and departure cleanup
+
+- Red and Blue use fixed-size synchronized integer arrays of VRChat player IDs.
+- `-1` marks an empty slot.
+- Player names are rebuilt locally from those IDs whenever the scoreboard refreshes.
+- When a registered player leaves the instance, the manager owner removes that ID and serializes the cleaned team lists.
+- A player leaving never resets or cancels the whole match automatically.
+- If one team becomes empty during an active match, the match continues until players deliberately reset it.
 
 ## Current architecture question
 
-**How should Red and Blue team registrations be stored, and what should happen when a registered player leaves the VRChat instance?**
+**How should the synchronized countdown work for all players and late joiners?**
 
 Recommended first-release rule:
 
-- store VRChat player IDs in fixed-size synchronized integer arrays for Red and Blue;
-- use `-1` for an empty slot;
-- derive visible player names locally from those IDs whenever the scoreboard refreshes;
-- when a registered player leaves the instance, the current manager owner removes that player ID from the correct team and serializes the cleaned lists;
-- leaving the instance never cancels the whole match automatically;
-- if one team becomes empty during an active match, the match continues until players deliberately reset it.
+- when the match starts, synchronize one network end timestamp;
+- every client calculates the remaining time locally from that same timestamp;
+- do not synchronize the timer every second;
+- when time reaches zero, only the current manager owner changes the phase to `FINISHED` or `SUDDEN_DEATH` and serializes that result;
+- late joiners immediately calculate the correct remaining time from the shared end timestamp.
 
 Discuss only this decision next.
 
@@ -135,12 +141,11 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. network-time countdown and late-join reconstruction;
-2. goal validation and anti-double-score flow;
-3. football ownership, reset and Rigidbody handling;
-4. announcements, audio and particle event reconstruction;
-5. configurable button actions and automatic view refresh;
-6. smallest build-and-test order.
+1. goal validation and anti-double-score flow;
+2. football ownership, reset and Rigidbody handling;
+3. announcements, audio and particle event reconstruction;
+4. configurable button actions and automatic view refresh;
+5. smallest build-and-test order.
 
 ## Do not do yet
 
