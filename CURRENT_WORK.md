@@ -35,6 +35,9 @@ M1 — Define the smallest reliable shared match system for Soccer and Soccer Ho
 - Shared state supports late join and rejoin.
 - Sport-mode switching leaves the match intact.
 - Reset Game is separate and deliberate.
+- `No Limit` is not part of the first release.
+- Visitors who only want to play casually can leave the official match unstarted and use the manual score controls to keep their own score.
+- The timer, end buzzer and sudden death belong only to a formally started timed match.
 
 ### Players, teams and permissions
 
@@ -121,10 +124,12 @@ Stef has already created:
 
 - Red and Blue player lists;
 - timer and team scores;
-- time controls and No Limit;
+- time increase and decrease controls;
 - Start Game, Join Red, Join Blue, Leave Game and Reset Game;
 - manual score correction controls;
 - a large shared announcement panel.
+
+The existing `No Limit` control is outside the accepted first-release scope and should not be connected to the new manager.
 
 UI objects display manager state and do not store independent match state.
 
@@ -141,23 +146,21 @@ Proposed, not yet approved for implementation:
 
 ## Current design question
 
-**Should `No Limit` remain in the first release?**
+**How long should start and lock-status announcements stay visible in the large announcement panel?**
 
-Recommended rule:
+Recommended first-release rule:
 
-- keep `No Limit`;
-- when enabled, the timer shows `NO LIMIT` instead of counting down;
-- the match ends only when a registered player deliberately resets or changes the time mode;
-- sudden death does not apply because there is no time expiry.
+- show short confirmation messages such as `GAME STARTED`, `TEAMS LOCKED` or `TEAM SWITCHING OPEN` for about two seconds;
+- clear them automatically so the announcement panel is ready for goals and important warnings;
+- persistent states remain visible on the relevant button itself, not permanently in the main announcement panel.
 
 Discuss only this question next.
 
 ## Remaining open questions
 
-1. Exact announcement timing for start and lock messages.
-2. Whether manual score correction is allowed during sudden death.
-3. Exact goal anti-double-score and ball-ownership implementation.
-4. Whether full cleanup needs its own separate button or a longer Reset confirmation.
+1. Whether manual score correction is allowed during sudden death.
+2. Exact goal anti-double-score and ball-ownership implementation.
+3. Whether full cleanup needs its own separate button or a longer Reset confirmation.
 
 ## Do not do yet
 
