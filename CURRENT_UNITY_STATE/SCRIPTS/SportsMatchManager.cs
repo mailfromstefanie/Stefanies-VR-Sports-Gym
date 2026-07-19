@@ -93,6 +93,167 @@ namespace StefanieInVR
             initialized = true;
         }
 
+        public override void OnPlayerLeft(VRCPlayerApi player)
+        {
+            if (player == null || !Networking.IsOwner(gameObject))
+            {
+                return;
+            }
+
+            int playerId = player.playerId;
+            bool removed = RemovePlayerId(redPlayerIds, playerId);
+            removed = RemovePlayerId(bluePlayerIds, playerId) || removed;
+
+            if (removed)
+            {
+                RequestSerialization();
+            }
+        }
+
+        public void RequestJoinRed()
+        {
+            RequestJoinTeam(TEAM_RED);
+        }
+
+        public void RequestJoinBlue()
+        {
+            RequestJoinTeam(TEAM_BLUE);
+        }
+
+        public void RequestLeaveGame()
+        {
+            VRCPlayerApi localPlayer = Networking.LocalPlayer;
+            if (!IsValidPlayer(localPlayer))
+            {
+                return;
+            }
+
+            int playerId = localPlayer.playerId;
+            if (GetPlayerTeam(playerId) == TEAM_NONE)
+            {
+                return;
+            }
+
+            if (!TakeLocalOwnership(localPlayer))
+            {
+                return;
+            }
+
+            bool removed = RemovePlayerId(redPlayerIds, playerId);
+            removed = RemovePlayerId(bluePlayerIds, playerId) || removed;
+
+            if (removed)
+            {
+                RequestSerialization();
+            }
+        }
+
+        private void RequestJoinTeam(int targetTeam)
+        {
+            if (targetTeam != TEAM_RED && targetTeam != TEAM_BLUE)
+            {
+                return;
+            }
+
+            if (!teamSwitchingOpen)
+            {
+                return;
+            }
+
+            VRCPlayerApi localPlayer = Networking.LocalPlayer;
+            if (!IsValidPlayer(localPlayer))
+            {
+                return;
+            }
+
+            int playerId = localPlayer.playerId;
+            if (GetPlayerTeam(playerId) == targetTeam)
+            {
+                return;
+            }
+
+            int[] targetIds = targetTeam == TEAM_RED
+                ? redPlayerIds
+                : bluePlayerIds;
+
+            if (FindEmptySlot(targetIds) < 0)
+            {
+                return;
+            }
+
+            if (!TakeLocalOwnership(localPlayer))
+            {
+                return;
+            }
+
+            RemovePlayerId(redPlayerIds, playerId);
+            RemovePlayerId(bluePlayerIds, playerId);
+
+            int emptySlot = FindEmptySlot(targetIds);
+            if (emptySlot < 0)
+            {
+                return;
+            }
+
+            targetIds[emptySlot] = playerId;
+            RequestSerialization();
+        }
+
+        private bool TakeLocalOwnership(VRCPlayerApi localPlayer)
+        {
+            if (Networking.IsOwner(gameObject))
+            {
+                return true;
+            }
+
+            Networking.SetOwner(localPlayer, gameObject);
+            return Networking.IsOwner(gameObject);
+        }
+
+        private bool IsValidPlayer(VRCPlayerApi player)
+        {
+            return player != null && player.IsValid();
+        }
+
+        private int FindEmptySlot(int[] playerIds)
+        {
+            if (playerIds == null)
+            {
+                return -1;
+            }
+
+            for (int i = 0; i < playerIds.Length; i++)
+            {
+                if (playerIds[i] == EMPTY_PLAYER_SLOT)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private bool RemovePlayerId(int[] playerIds, int playerId)
+        {
+            if (playerIds == null)
+            {
+                return false;
+            }
+
+            bool removed = false;
+
+            for (int i = 0; i < playerIds.Length; i++)
+            {
+                if (playerIds[i] == playerId)
+                {
+                    playerIds[i] = EMPTY_PLAYER_SLOT;
+                    removed = true;
+                }
+            }
+
+            return removed;
+        }
+
         private void InitializeOwnerSnapshot()
         {
             matchPhase = PHASE_READY;
@@ -172,6 +333,39 @@ namespace StefanieInVR
         public int[] GetBluePlayerIds()
         {
             return bluePlayerIds;
+        }
+
+        public int GetPlayerTeam(int playerId)
+        {
+            if (ContainsPlayerId(redPlayerIds, playerId))
+            {
+                return TEAM_RED;
+            }
+
+            if (ContainsPlayerId(bluePlayerIds, playerId))
+            {
+                return TEAM_BLUE;
+            }
+
+            return TEAM_NONE;
+        }
+
+        private bool ContainsPlayerId(int[] playerIds, int playerId)
+        {
+            if (playerIds == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < playerIds.Length; i++)
+            {
+                if (playerIds[i] == playerId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public int GetPersistentAnnouncement()
