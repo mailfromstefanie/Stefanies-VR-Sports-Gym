@@ -118,6 +118,13 @@ The scoreboard must be understandable to someone using VR for the first time.
 - Late joiners, resets and ownership changes rebuild the correct text automatically.
 - The central match manager remains the source of truth; buttons and labels only display that state.
 
+### Announcement timing
+
+- Short status confirmations such as `GAME STARTED`, `TEAMS LOCKED` and `TEAM SWITCHING OPEN` remain visible for about two seconds.
+- They then clear automatically so the announcement panel is ready for goals, warnings and other important match states.
+- Persistent information belongs on the relevant button or control itself.
+- Important states such as `NEXT GOAL WINS`, reset confirmation and the winner message follow their own longer lifetime rules.
+
 ## Existing scoreboard UI
 
 Stef has already created:
@@ -146,21 +153,22 @@ Proposed, not yet approved for implementation:
 
 ## Current design question
 
-**How long should start and lock-status announcements stay visible in the large announcement panel?**
+**May the manual score-correction buttons change the score during sudden death?**
 
 Recommended first-release rule:
 
-- show short confirmation messages such as `GAME STARTED`, `TEAMS LOCKED` or `TEAM SWITCHING OPEN` for about two seconds;
-- clear them automatically so the announcement panel is ready for goals and important warnings;
-- persistent states remain visible on the relevant button itself, not permanently in the main announcement panel.
+- disable manual score correction during sudden death;
+- the next accepted physical goal must decide the match;
+- manual corrections remain available before a match and during normal timed play for fixing mistakes.
+
+This prevents someone from accidentally or deliberately ending sudden death through the scoreboard instead of through play.
 
 Discuss only this question next.
 
 ## Remaining open questions
 
-1. Whether manual score correction is allowed during sudden death.
-2. Exact goal anti-double-score and ball-ownership implementation.
-3. Whether full cleanup needs its own separate button or a longer Reset confirmation.
+1. Exact goal anti-double-score and ball-ownership implementation.
+2. Whether full cleanup needs its own separate button or a longer Reset confirmation.
 
 ## Do not do yet
 
