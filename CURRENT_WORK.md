@@ -56,15 +56,13 @@ Key accepted rules:
 - The protected basketball package remains read-only reference material.
 - The first release must stay small, understandable and testable.
 
-## First architecture decision
-
-Decide whether all scoreboard match truth belongs in one central synchronized manager or is split across several synchronized managers.
-
-Recommended first-release architecture:
+## Approved architecture decision
 
 ### One central `SportsMatchManager`
 
-This single manually synchronized UdonSharp behaviour owns:
+One manually synchronized UdonSharp behaviour is the only source of truth for the complete match.
+
+It owns:
 
 - Red and Blue registered player IDs;
 - Red and Blue scores;
@@ -76,29 +74,39 @@ This single manually synchronized UdonSharp behaviour owns:
 - shared announcement state;
 - goal/reset lock state needed to prevent duplicate scoring.
 
-Other components do not keep competing copies of that truth.
+Other components do not store competing synchronized copies of this truth.
 
 ### Small helper behaviours
 
 - `SportsMatchButton`: sends one Inspector-selected action request to `SportsMatchManager`.
 - `SportsGoalDetector`: reports whether the Red or Blue goal was entered.
 - `SportsScoreboardView`: reads manager state and refreshes TMP texts, button labels, colours and visibility.
-- Ball reset remains commanded by the manager through a configured football Rigidbody, VRC Object Sync and centre anchor; whether this needs a tiny dedicated helper is decided later from the actual ball setup.
+- Ball reset remains commanded by the manager through the configured football Rigidbody, VRC Object Sync and centre anchor; whether a tiny dedicated helper is needed will be decided from the actual ball setup.
 
-### Why one manager is recommended
+### Why this is approved
 
 - One ownership target for match changes.
 - One serialization point after accepted state changes.
 - Late joiners reconstruct one coherent snapshot.
 - Less chance that timer, teams, score and announcement disagree.
 - Easier to debug and explain in noob-friendly Unity steps.
-- Still keeps responsibilities clear because input, detection and display stay in separate helper behaviours.
+- Input, detection and display still remain cleanly separated.
 
-This is architecture only and is not permission to create these scripts yet.
+This is architecture approval only and is not permission to create scripts yet.
 
 ## Current architecture question
 
-**Approve one central manually synchronized `SportsMatchManager` as the only source of truth for the complete match, with small unsynchronized input, detector and view helpers around it?**
+**Which explicit match phases should `SportsMatchManager` use?**
+
+Recommended first-release state machine:
+
+1. `READY` — no official match is running; players may join and manual score controls may be used.
+2. `PLAYING` — timer is running and valid goals count.
+3. `GOAL_PAUSE` — a normal goal has counted; duplicate goals are blocked while the ball resets for about two seconds.
+4. `SUDDEN_DEATH` — timer is at zero, score is tied and only the next physical goal may decide the match.
+5. `FINISHED` — winner is fixed; scoring and match controls remain blocked until Reset Game.
+
+The reset-confirmation and clear-player-confirmation windows should be temporary confirmation data, not separate match phases.
 
 Discuss only this decision next.
 
@@ -106,7 +114,7 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. exact match phases and synchronized fields;
+1. exact synchronized fields;
 2. ownership and serialization rules for button actions;
 3. team-registration storage and player-leave cleanup;
 4. network-time countdown and late-join reconstruction;
