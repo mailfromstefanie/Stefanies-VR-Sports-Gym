@@ -100,3 +100,12 @@ Only a player who is already registered in Red or Blue may toggle `Allow Team Sw
 **Reason:** This prevents accidental empty or one-sided matches and makes the start condition clear to everyone.
 
 **Preferred status text:** `Both teams need a player`.
+
+## D-014 — Equal score enters sudden death
+**Status:** Accepted
+
+When the countdown reaches zero and Red and Blue have equal scores, the timer stops at `00:00` but the match remains active in sudden death. The next valid goal immediately ends the match and determines the winning team.
+
+**Reason:** Stef prefers a decisive and exciting finish instead of a draw.
+
+**Boundary:** During sudden death, normal goal validation and anti-double-score protection still apply. The winner presentation plays only after the deciding goal is accepted.
