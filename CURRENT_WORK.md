@@ -55,6 +55,7 @@ Do not replace these scripts without a separate accepted decision.
 
 - Package: `REFERENCE_PACKAGES/Basketball/Basketball_TestScene_Inspection.unitypackage`
 - Analysis: `REFERENCE_PACKAGES/Basketball/ANALYSIS.md`
+- Inspector notes: `REFERENCE_PACKAGES/Basketball/INSPECTOR_REFERENCE.md`
 - Treat the original basketball scene, prefabs and scripts as read-only reference material.
 
 Reusable proven patterns include:
@@ -68,6 +69,8 @@ Reusable proven patterns include:
 - visuals as display;
 - goal detectors reporting points to a manager;
 - one configurable button script with an Inspector action dropdown.
+
+Do not copy the original random team assignment. The Sports Gym uses explicit `Join Red` and `Join Blue` actions.
 
 ## Accepted first-release match experience
 
@@ -89,7 +92,9 @@ Reusable proven patterns include:
 - A player belongs to at most one team.
 - Player names are available for team lists and the result.
 - Before match start, players may choose or change teams.
-- `Start Game` locks both teams.
+- `Start Game` requires at least one registered player in Red and at least one in Blue.
+- If either team is empty, start is refused and a short status such as `Both teams need a player` is shown.
+- A successful start locks both teams.
 - While locked, new players cannot join and registered players cannot switch.
 - `Allow Team Switching` temporarily opens joining and switching during an active match.
 - Turning it off locks teams again.
@@ -129,12 +134,14 @@ Proposed, not yet approved for implementation:
 
 Decide this next:
 
-**May a match start when Red or Blue has no registered players?**
+**What happens when the score is equal when the timer reaches zero?**
 
-Recommended first-release rule:
+Small options:
 
-- require at least one registered player in Red and at least one in Blue before `Start Game` succeeds;
-- if either team is empty, the manager refuses the start and shows a short status such as `Both teams need a player`.
+- finish immediately as `Draw`;
+- continue with sudden death, where the next valid goal wins.
+
+Recommended first-release rule: finish as `Draw`. It is simpler, predictable and avoids a match continuing indefinitely.
 
 Discuss only this question next.
 
@@ -142,15 +149,14 @@ Discuss only this question next.
 
 After the current question is resolved, discuss one at a time:
 
-1. What happens on a draw.
-2. Who may start or reset a match.
-3. Exact goal anti-double-score behaviour.
-4. Ball reset behaviour after a goal.
-5. Exact winner text and player-name presentation.
-6. Whether team membership persists after a completed match.
-7. Whether Reset Game needs confirmation.
-8. How the UI visually shows locked and open teams.
-9. Whether No Limit remains in the first release.
+1. Who may start or reset a match.
+2. Exact goal anti-double-score behaviour.
+3. Ball reset behaviour after a goal.
+4. Exact winner text and player-name presentation.
+5. Whether team membership persists after a completed match.
+6. Whether Reset Game needs confirmation.
+7. How the UI visually shows locked and open teams.
+8. Whether No Limit remains in the first release.
 
 ## Risks
 
@@ -167,7 +173,7 @@ After the current question is resolved, discuss one at a time:
 
 Answer only:
 
-Should `Start Game` require at least one registered player in both Red and Blue?
+At equal score when time expires, should the match end as a draw or continue into sudden death?
 
 No Unity changes are needed yet.
 
