@@ -185,3 +185,21 @@ Small helper behaviours remain separate for input, goal reporting and display re
 Reset confirmation and Clear All Players confirmation are temporary confirmation data, not extra match phases.
 
 **Reason:** Explicit internal phases keep scoring, timing and ball-reset logic reliable, while plain visible wording keeps the experience intuitive for first-time VR users.
+
+## D-029 — Synchronize one reconstructable match snapshot
+**Status:** Accepted
+
+`SportsMatchManager` synchronizes the match phase, Red and Blue scores, configured duration, network end timestamp, team-switching state, winner team, Red and Blue player IDs, persistent announcement type, announcement sequence number and goal-pause end timestamp.
+
+The countdown display is calculated locally from the shared network end timestamp instead of serializing every second.
+
+**Reason:** Late joiners can rebuild one coherent match while network traffic remains small and predictable.
+
+## D-030 — Validate before ownership and serialize accepted changes once
+**Status:** Accepted
+
+The manager checks the requesting player, permissions and current match phase before taking ownership. Rejected actions do not take ownership and do not serialize match state.
+
+For an accepted action, the requesting player takes ownership of the `SportsMatchManager`. After ownership is confirmed, all synchronized values belonging to that action are changed together and `RequestSerialization()` is called once.
+
+**Reason:** This prevents partial updates, avoids needless ownership changes for invalid actions and keeps one clear serialization point.
