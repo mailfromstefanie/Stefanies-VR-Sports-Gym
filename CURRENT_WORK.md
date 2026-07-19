@@ -6,7 +6,7 @@
 
 ## Current phase
 
-Inventory and interaction design
+Interaction design complete; architecture review is next.
 
 Do not start Unity implementation yet.
 
@@ -95,7 +95,6 @@ The winner presentation also uses:
 - A normal rematch reset clears score, timer, sudden death, announcement and winner state.
 - A normal rematch reset does not clear the Red and Blue player lists.
 - Players leave through `Leave Game` or switch teams only while team switching is allowed.
-- A separate full cleanup may clear all registrations when the group deliberately wants new teams or an abandoned board must be restored.
 
 ### Reset confirmation
 
@@ -106,6 +105,17 @@ The winner presentation also uses:
 - If five seconds pass, the confirmation expires and nothing changes.
 - When nobody is registered, any visitor may use the same two-press confirmation to restore an abandoned board.
 - A different player cannot complete another player's pending confirmation.
+
+### Clear All Players
+
+- `CLEAR ALL PLAYERS` is a separate action from `Reset Game`.
+- It is available only while no match is active.
+- The first valid press changes that same button to `PRESS AGAIN TO CONFIRM` for about five seconds.
+- The same player must press the same button again within that window.
+- The second press removes everyone from Red and Blue.
+- If the window expires, the button automatically returns to `CLEAR ALL PLAYERS` and nothing changes.
+- The announcement panel may simultaneously show `CLEAR ALL PLAYERS?`.
+- Normal `Reset Game` never clears the team lists.
 
 ### Beginner-friendly team status UI
 
@@ -140,6 +150,8 @@ Stef has already created:
 
 The existing `No Limit` control is outside the accepted first-release scope and should not be connected to the new manager.
 
+A separate `CLEAR ALL PLAYERS` button still needs to be added later during the approved Unity build phase.
+
 UI objects display manager state and do not store independent match state.
 
 ## Likely smallest architecture
@@ -153,24 +165,23 @@ Proposed, not yet approved for implementation:
 - One configurable action-button behaviour routes Inspector-selected actions.
 - Scoreboard visuals only render manager state.
 
-## Current design question
+## Next design step
 
-**How should a complete cleanup that removes all registered players be triggered?**
+The first-release interaction design is now complete.
 
-Recommended first-release rule:
+Next, review and approve the smallest technical architecture before any Unity hierarchy or script changes are made. That architecture review must cover:
 
-- keep normal `Reset Game` for rematches and preserve both team lists;
-- add a separate clearly named `CLEAR ALL PLAYERS` action;
-- require the same two-press confirmation pattern;
-- allow it only when no match is active, or after the match has already been reset.
+- the exact synchronized fields and match states;
+- ownership rules for manager actions and the football;
+- goal anti-double-score protection;
+- ball reset and Rigidbody handling;
+- late-join reconstruction;
+- how the configurable action buttons and automatic visuals connect to the manager;
+- a microstep build-and-test order.
 
-This prevents a normal rematch reset from unexpectedly deleting both teams.
+## Exact next step for Stef
 
-Discuss only this question next.
-
-## Remaining open questions
-
-1. Exact goal anti-double-score and ball-ownership implementation.
+Approve moving from interaction design into architecture design. This is not yet permission to write scripts or change Unity.
 
 ## Do not do yet
 
