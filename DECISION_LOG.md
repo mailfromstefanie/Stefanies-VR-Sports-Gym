@@ -143,3 +143,12 @@ Brief confirmations such as `GAME STARTED`, `TEAMS LOCKED` and `TEAM SWITCHING O
 Persistent state stays visible on the relevant control itself. Important messages such as `NEXT GOAL WINS`, reset confirmation and the final winner follow their own longer display rules.
 
 **Reason:** The announcement panel must give clear feedback without becoming occupied when a goal, warning or important match-state message needs to appear.
+
+## D-025 — Manual score correction is blocked during sudden death
+**Status:** Accepted
+
+The manual Red and Blue plus/minus score controls cannot change the score while the match is in sudden death. Only an accepted physical goal may end sudden death and determine the winner.
+
+Manual correction remains available before an official match and during normal timed play so players can fix an incorrect score.
+
+**Reason:** Sudden death must be decided on the field, not accidentally or deliberately through the scoreboard.
