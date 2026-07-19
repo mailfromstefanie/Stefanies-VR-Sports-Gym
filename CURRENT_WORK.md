@@ -110,7 +110,19 @@ The package contains a full basketball test scene and the main scripts:
 - goal audio;
 - synchronized goal effects.
 
-### Missing from the basketball reference
+### Reusable configurable button pattern
+
+`BasketBallButtons` demonstrates a useful Inspector-driven input pattern:
+
+- each UI button has the same button behaviour;
+- Unity UI `On Click` invokes `UdonBehaviour.Interact()`;
+- an Inspector enum/dropdown selects the intended action, such as Join Game, Leave Game, Start Game or changing the match duration;
+- the button behaviour routes that selected action to the referenced manager or ball settings;
+- a new button can therefore be configured mainly through Inspector references instead of wiring a different public method for every button.
+
+This pattern is a strong candidate for a future reusable Sports Gym button prefab and, after separate design and testing, for Stefanie's Art House Cinema. It is not yet approved as a finished universal framework.
+
+## Missing from the basketball reference
 
 The existing package does not yet:
 
@@ -119,19 +131,22 @@ The existing package does not yet:
 - play winner particles at match end;
 - provide a generic score interface for Soccer, Volleyball or Soccer Hockey.
 
-## Stef's desired simple experience
+## Accepted first-release experience direction
 
-Provisional intent, not yet final architecture:
+Stef selected **B — Registered players**.
 
-- a match lasts about ten minutes;
-- score is kept during play;
-- the winner is announced at the end;
-- a particle effect plays;
-- a cheering sound plays;
-- the system should remain as simple as reasonably possible;
-- the original basketball prefab must not be damaged.
+The first public-release design must therefore support:
 
-Player-name presentation is still an open design choice because some sports may be played by teams rather than one individual winner.
+- players joining and leaving the match;
+- players being associated with a team;
+- player names being available for score and result presentation;
+- a match lasting about ten minutes;
+- score being kept during play;
+- winner presentation at the end;
+- a particle effect and cheering sound;
+- protection of the original basketball prefab.
+
+The exact winner text is not decided yet. For a team game it may need to show the winning team and one or more registered player names rather than claiming one individual always won.
 
 ## Current architectural observation
 
@@ -142,7 +157,8 @@ The basketball package provides useful proven patterns:
 - buttons as input only;
 - UI as display only;
 - sport or goal logic reporting points to a manager;
-- serialization only when state changes.
+- serialization only when state changes;
+- one configurable button script using an Inspector action enum.
 
 However, `BasketBallGrouping` is strongly basketball-specific and combines player registration, team assignment, score bookkeeping, timer, UI and overhead tags.
 
@@ -150,11 +166,14 @@ A small independent generic match manager may be safer than forcing the basketba
 
 ## Current design question
 
-Decide this first, before discussing implementation:
+Decide this next, before discussing implementation:
 
-**For the first public release, does the score system need registered players and individual names, or is a simpler Left Team versus Right Team match sufficient?**
+**How should registered players enter teams for the first public release?**
 
-This choice determines whether player registration and team assignment are necessary at all.
+- **A — Automatic balanced assignment:** players press Join; the system divides them between Red and Blue when the match starts.
+- **B — Manual team choice:** players explicitly press Join Red or Join Blue.
+
+The basketball reference currently uses automatic assignment. Manual choice gives players control but needs extra rules for uneven or empty teams.
 
 Discuss only this question next.
 
@@ -162,13 +181,14 @@ Discuss only this question next.
 
 After the current question is resolved, discuss one at a time:
 
-1. How players join or choose a team, if registration is needed.
-2. Whether all sports use a fixed ten-minute duration.
-3. Which sports report scores automatically and which use manual controls.
-4. What happens on a draw.
-5. Whether changing sport mode cancels and resets the active match.
-6. Who may start, reset or edit a match.
-7. How late joiners see the active match and result.
+1. Whether all sports use a fixed ten-minute duration.
+2. Which sports report scores automatically and which use manual controls.
+3. What happens on a draw.
+4. Whether changing sport mode cancels and resets the active match.
+5. Who may start, reset or edit a match.
+6. How late joiners see the active match and result.
+7. How the winning team and registered player names are presented.
+8. Whether the configurable action-button pattern becomes a separate generic prefab now or later.
 
 ## Risks
 
@@ -177,17 +197,18 @@ After the current question is resolved, discuss one at a time:
 - Copying basketball-specific complexity into every sport.
 - Mixing UI state with match state.
 - Networking that fails for late joiners or after ownership changes.
-- Adding player registration when a simpler team scoreboard would be enough.
+- Manual team choice allowing heavily uneven teams without clear rules.
+- Turning the generic button idea into an oversized framework before the Sports Gym release.
 - Expanding scope and delaying a nearly finished world.
 
 ## Exact next step for Stef
 
 Answer only the current design question:
 
-For the first public release, choose between:
+For registered players, choose between:
 
-- **A — Simple team match:** Left Team versus Right Team, without registering individual players; or
-- **B — Registered players:** players Join, receive or choose teams, and their names can be shown in the result.
+- **A — Automatic balanced assignment** when the match starts; or
+- **B — Manual Join Red / Join Blue buttons**.
 
 No Unity changes are needed for this step.
 
@@ -195,6 +216,7 @@ No Unity changes are needed for this step.
 
 - Do not create a generic MatchManager or ScoreManager.
 - Do not edit the basketball scripts or prefabs.
+- Do not create the universal button prefab yet.
 - Do not connect score buttons.
 - Do not add synchronized variables.
 - Do not alter the Unity hierarchy.
