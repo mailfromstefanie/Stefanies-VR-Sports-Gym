@@ -125,3 +125,12 @@ The team-switching control automatically displays its current shared state as `T
 When someone attempts to join or switch while teams are locked, the shared announcement panel briefly shows `TEAMS ARE LOCKED` and `ASK A PLAYER TO OPEN TEAM SWITCHING`.
 
 **Reason:** The scoreboard must be intuitive for visitors using VR for the first time. The manager owns the state; UI text and colours update automatically from that same state.
+
+## D-023 — No Limit is excluded from the first release
+**Status:** Accepted
+
+The new first-release match manager will not support a `No Limit` match mode. Official matches are timed and use the normal buzzer, winner and sudden-death flow.
+
+Visitors who only want to kick the ball around casually do not need to start an official match. They may use the existing manual score controls to keep an informal score without activating the timed match system.
+
+**Reason:** A separate unlimited mode adds unnecessary state and UI complexity while casual play already works without it.
