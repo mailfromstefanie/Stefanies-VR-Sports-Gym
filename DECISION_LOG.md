@@ -44,7 +44,7 @@ Registered players choose their own team through separate `Join Red` and `Join B
 
 **Reason:** Stef wants players to decide which side they play for. The UI can use the accepted configurable action-button pattern.
 
-**Boundary:** Empty-team rules and permissions for reopening teams are still being designed.
+**Boundary:** Empty-team rules are still being designed.
 
 ## D-007 — Current release match scope is Soccer and Soccer Hockey
 **Status:** Accepted
@@ -85,4 +85,11 @@ When `Start Game` is pressed, Red and Blue lock. While locked, new players canno
 
 **Reason:** An active match should not silently change because a late visitor presses Join. Reopening teams is a deliberate social decision by the current group.
 
-**Boundary:** The exact player or role allowed to operate `Allow Team Switching`, and how the unlocked state is displayed, remain open design questions.
+## D-012 — Only registered players may reopen teams
+**Status:** Accepted
+
+Only a player who is already registered in Red or Blue may toggle `Allow Team Switching` during an active match. A spectator or late visitor who is not part of either team cannot open the teams.
+
+**Reason:** The people already playing control whether the running match admits or moves players. This keeps the system social without allowing an outsider to disrupt the match.
+
+**Boundary:** Any registered player may operate the control; there is no separate captain role in the first release.
