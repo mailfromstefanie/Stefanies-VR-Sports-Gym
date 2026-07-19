@@ -6,13 +6,13 @@
 
 ## Current phase
 
-Implementation — microstep 4 player-list rendering.
+Testing — microstep 5 two-client team-list synchronization.
 
 The first-release interaction design and technical architecture are approved.
 
 ## Current milestone
 
-M3 — Verify local team registration and begin the smallest synchronized scoreboard view.
+M3 — Verify synchronized team registration and the smallest scoreboard view.
 
 ## Confirmed project setup
 
@@ -24,6 +24,7 @@ M3 — Verify local team registration and begin the smallest synchronized scoreb
 - The protected basketball reference remains read-only.
 - `SportsModeManager.cs` remains the synchronized sport-mode truth.
 - The current football is a SoccerBox ball with its own `SBBall` synchronization and child `BallTrigger` interaction.
+- Manager GameObjects remain active continuously; sport-specific roots and scoreboard visuals may be inactive until their mode is selected.
 
 ## Approved architecture
 
@@ -36,7 +37,8 @@ M3 — Verify local team registration and begin the smallest synchronized scoreb
 - Persistent announcements and winner particles reconstruct for late joiners.
 - One-shot audio is played only for newly received events.
 - `SportsMatchButton` uses an Inspector-selected integer action and keeps no match state.
-- `SportsScoreboardView` will render all texts and visuals from manager state.
+- `SportsScoreboardView` renders texts and visuals from manager state.
+- Scoreboard refresh is event-driven: startup, accepted manager changes, player cleanup and deserialization call one refresh. There is no per-frame `Update()` refresh.
 
 ## Completed microsteps
 
@@ -47,31 +49,45 @@ M3 — Verify local team registration and begin the smallest synchronized scoreb
 - Manager-side Join Red, Join Blue and Leave Game logic added and compiled.
 - `SportsMatchButton.cs` added and corrected for the installed UdonSharp version.
 - Temporary Inspector debug fields added.
-- Local ClientSim test passed:
+- Local ClientSim manager test passed:
   - Join Red: local team `1`, Red `1`, Blue `0`;
   - Join Blue: local team `2`, Red `0`, Blue `1`;
   - Leave Game: `0, 0, 0`.
+- `SportsScoreboardView.cs` added and compiled without red errors.
+- The view is connected to `SportsMatchManager` and the Red and Blue `PlayerNames` TMP texts.
+- The manager holds a reference to the view and refreshes it only after meaningful state changes and deserialization.
+- Local ClientSim player-list rendering passed:
+  - Join Red displays the local name only under Red;
+  - Join Blue moves the name from Red to Blue;
+  - Leave Game clears both lists.
+- Inactive-root reconstruction passed:
+  - the player joined Red while the Soccer scoreboard root was inactive in Basketball mode;
+  - after switching to Soccer, the already registered name appeared immediately.
 
 ## Current microstep
 
-Create only the first minimal `SportsScoreboardView` that:
+Run only the first two-client synchronization test for team registration and player-list rendering.
 
-1. references `SportsMatchManager`;
-2. references one Red-team text and one Blue-team text;
-3. converts synchronized player IDs into current display names;
-4. refreshes after startup and manager state changes;
-5. contains no score, timer, winner, lock or announcement rendering yet.
+Test that:
+
+1. client A joins Red;
+2. client B sees A under Red;
+3. client B joins Blue;
+4. both clients see the same Red and Blue lists;
+5. one client switches team and both clients update;
+6. one client leaves the game and both clients clear that registration.
+
+Do not add score, timer, goals or reset behaviour during this test.
 
 ## Pass condition
 
-- Unity and UdonSharp compile the view without red errors.
-- In ClientSim, joining Red shows the local display name only in the Red text.
-- Switching to Blue removes the name from Red and shows it only in Blue.
-- Leaving clears both texts.
+- Both clients display identical Red and Blue player lists after every accepted Join, Switch and Leave action.
+- Ownership transfer does not create duplicate registrations or remove the other player's registration.
+- No red Console or Udon errors occur.
 
 ## Not implemented yet
 
-- no two-client synchronization test;
+- no completed two-client synchronization test;
 - no score or timer behaviour;
 - no goals or goal triggers;
 - no reset confirmations;
