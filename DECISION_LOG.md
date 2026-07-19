@@ -120,3 +120,14 @@ At normal time expiry, a buzzer plays. If the score is tied, the timer remains a
 **Reason:** Players should understand the current match state immediately without needing to know hidden rules.
 
 **Boundary:** The final list of messages, animation timing and audio clips will be defined during UI and implementation design.
+
+## D-016 — Registered players control Start and Reset
+**Status:** Accepted
+
+When one or more players are registered, only a player currently registered in Red or Blue may use `Start Game` or `Reset Game`.
+
+When no players are registered at all, any visitor may use Reset Game or other setup controls needed to return the board to a clean waiting state. `Start Game` still cannot begin until both Red and Blue contain at least one registered player.
+
+**Reason:** Active participants should control their own match, while an abandoned or unused board must never become permanently locked for later visitors.
+
+**Boundary:** Reset Game still needs a deliberate confirmation or hold interaction to reduce accidental resets.
