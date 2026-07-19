@@ -56,7 +56,7 @@ Key accepted rules:
 - The protected basketball package remains read-only reference material.
 - The first release must stay small, understandable and testable.
 
-## Approved architecture decision
+## Approved architecture decisions
 
 ### One central `SportsMatchManager`
 
@@ -83,22 +83,9 @@ Other components do not store competing synchronized copies of this truth.
 - `SportsScoreboardView`: reads manager state and refreshes TMP texts, button labels, colours and visibility.
 - Ball reset remains commanded by the manager through the configured football Rigidbody, VRC Object Sync and centre anchor; whether a tiny dedicated helper is needed will be decided from the actual ball setup.
 
-### Why this is approved
+### Explicit match phases
 
-- One ownership target for match changes.
-- One serialization point after accepted state changes.
-- Late joiners reconstruct one coherent snapshot.
-- Less chance that timer, teams, score and announcement disagree.
-- Easier to debug and explain in noob-friendly Unity steps.
-- Input, detection and display still remain cleanly separated.
-
-This is architecture approval only and is not permission to create scripts yet.
-
-## Current architecture question
-
-**Which explicit match phases should `SportsMatchManager` use?**
-
-Recommended first-release state machine:
+`SportsMatchManager` uses five internal phases:
 
 1. `READY` — no official match is running; players may join and manual score controls may be used.
 2. `PLAYING` — timer is running and valid goals count.
@@ -106,7 +93,27 @@ Recommended first-release state machine:
 4. `SUDDEN_DEATH` — timer is at zero, score is tied and only the next physical goal may decide the match.
 5. `FINISHED` — winner is fixed; scoring and match controls remain blocked until Reset Game.
 
-The reset-confirmation and clear-player-confirmation windows should be temporary confirmation data, not separate match phases.
+`SUDDEN_DEATH` is only an internal code/state name. Visitors never need to understand that term. The scoreboard displays the plain instruction `NEXT GOAL WINS` for that phase.
+
+Reset confirmation and Clear All Players confirmation remain temporary confirmation data, not extra match phases.
+
+## Current architecture question
+
+**Which exact values need to be synchronized so every player and late joiner reconstructs the same match?**
+
+Recommended first-release synchronized snapshot:
+
+- match phase;
+- Red score and Blue score;
+- configured duration in seconds;
+- network end timestamp for the running timer;
+- team-switching open/locked state;
+- winner team;
+- Red and Blue registered player IDs;
+- current persistent announcement type and its sequence number;
+- goal-pause end timestamp when the ball is temporarily blocked.
+
+Local-only temporary data should include button hover visuals, local countdown drawing and a player's own pending confirmation display where possible. Confirmation authority still has to be checked by the manager.
 
 Discuss only this decision next.
 
@@ -114,15 +121,14 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. exact synchronized fields;
-2. ownership and serialization rules for button actions;
-3. team-registration storage and player-leave cleanup;
-4. network-time countdown and late-join reconstruction;
-5. goal validation and anti-double-score flow;
-6. football ownership, reset and Rigidbody handling;
-7. announcements, audio and particle event reconstruction;
-8. configurable button actions and automatic view refresh;
-9. smallest build-and-test order.
+1. ownership and serialization rules for button actions;
+2. team-registration storage and player-leave cleanup;
+3. network-time countdown and late-join reconstruction;
+4. goal validation and anti-double-score flow;
+5. football ownership, reset and Rigidbody handling;
+6. announcements, audio and particle event reconstruction;
+7. configurable button actions and automatic view refresh;
+8. smallest build-and-test order.
 
 ## Do not do yet
 
