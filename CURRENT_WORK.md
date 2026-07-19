@@ -89,7 +89,7 @@ Do not copy the original random team assignment. The Sports Gym uses explicit `J
 - In sudden death, the next valid goal immediately determines the winner.
 - Winner presentation uses text, particles and cheering audio.
 
-### Registration and teams
+### Registration, permissions and teams
 
 - Players choose their own team with `Join Red` or `Join Blue`.
 - A player belongs to at most one team.
@@ -103,7 +103,10 @@ Do not copy the original random team assignment. The Sports Gym uses explicit `J
 - Turning it off locks teams again.
 - The open/locked state is synchronized and visible to everyone.
 - Only a player already registered in Red or Blue may toggle `Allow Team Switching`.
-- An unregistered spectator or late visitor cannot open the teams.
+- When players are registered, only a registered Red or Blue player may use `Start Game` or `Reset Game`.
+- When no players are registered at all, any visitor may reset or prepare the abandoned board for a new match.
+- `Start Game` still cannot succeed until both teams contain a player.
+- Reset needs a deliberate confirmation or hold interaction to prevent accidents.
 
 ### Existing scoreboard UI
 
@@ -145,7 +148,7 @@ Accepted end-of-time behaviour:
 5. Show `NEXT GOAL WINS` in the announcement panel.
 6. The message may blink or pulse in a restrained way.
 7. Keep the message visible until the next valid goal ends the match.
-8. Late joiners during sudden death must immediately see the same message and state.
+8. Late joiners during sudden death immediately see the same message and state.
 
 ## Likely smallest architecture
 
@@ -161,12 +164,19 @@ Proposed, not yet approved for implementation:
 
 Decide this next:
 
-**Who may press `Start Game` and `Reset Game`?**
+**What should happen to the football immediately after a valid goal?**
+
+Small options:
+
+- automatically teleport the ball to the centre spot and briefly block further scoring;
+- leave the ball where it is and only use a short goal-detector cooldown;
+- require players to press a separate Respawn Ball button.
 
 Recommended first-release rule:
 
-- `Start Game`: any registered Red or Blue player;
-- `Reset Game`: any registered Red or Blue player, but require a deliberate confirmation or hold action later to reduce accidents.
+- automatically return the football to the centre after every accepted goal;
+- ignore further goal triggers until that reset is complete;
+- then resume play.
 
 Discuss only this question next.
 
@@ -174,14 +184,13 @@ Discuss only this question next.
 
 After the current question is resolved, discuss one at a time:
 
-1. Exact goal anti-double-score behaviour.
-2. Ball reset behaviour after a goal.
-3. Exact winner text and player-name presentation.
-4. Whether team membership persists after a completed match.
-5. Whether Reset Game needs confirmation.
-6. How the UI visually shows locked and open teams.
-7. Whether No Limit remains in the first release.
-8. Exact announcement-panel messages and timing.
+1. Exact goal anti-double-score implementation.
+2. Exact winner text and player-name presentation.
+3. Whether team membership persists after a completed match.
+4. Exact Reset Game confirmation interaction.
+5. How the UI visually shows locked and open teams.
+6. Whether No Limit remains in the first release.
+7. Exact announcement-panel messages and timing.
 
 ## Risks
 
@@ -199,7 +208,7 @@ After the current question is resolved, discuss one at a time:
 
 Answer only:
 
-Who may press `Start Game` and `Reset Game`?
+Should a valid goal automatically return the football to the centre spot?
 
 No Unity changes are needed yet.
 
