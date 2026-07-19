@@ -102,6 +102,19 @@ The winner presentation also uses:
 - When nobody is registered, any visitor may use the same two-press confirmation to restore an abandoned board.
 - A different player cannot complete another player's pending confirmation.
 
+### Beginner-friendly team status UI
+
+The scoreboard must be understandable to someone using VR for the first time.
+
+- Do not rely on colour alone.
+- The team-switching control changes its own text automatically from shared manager state.
+- Locked state: `TEAM SWITCHING: LOCKED` with helper text such as `Press to allow players to join or switch`.
+- Open state: `TEAM SWITCHING: OPEN` with helper text such as `Press to lock teams`.
+- If someone tries to join or switch while locked, show `TEAMS ARE LOCKED` and `ASK A PLAYER TO OPEN TEAM SWITCHING` briefly in the announcement panel.
+- Colour may support the state, but the words must fully explain it.
+- Late joiners, resets and ownership changes rebuild the correct text automatically.
+- The central match manager remains the source of truth; buttons and labels only display that state.
+
 ## Existing scoreboard UI
 
 Stef has already created:
@@ -128,23 +141,23 @@ Proposed, not yet approved for implementation:
 
 ## Current design question
 
-**How should the scoreboard show whether teams are locked or open for joining and switching?**
+**Should `No Limit` remain in the first release?**
 
-Recommended first-release rule:
+Recommended rule:
 
-- while teams are locked, show `TEAMS LOCKED` briefly when someone attempts to join or switch;
-- while switching is enabled, keep `TEAM SWITCHING ALLOWED` visible in the announcement panel or on the control itself;
-- use the button visual as the persistent indicator, so the main announcement panel remains available for goals and match messages.
+- keep `No Limit`;
+- when enabled, the timer shows `NO LIMIT` instead of counting down;
+- the match ends only when a registered player deliberately resets or changes the time mode;
+- sudden death does not apply because there is no time expiry.
 
 Discuss only this question next.
 
 ## Remaining open questions
 
-1. Whether No Limit remains in the first release.
-2. Exact announcement timing for start and lock messages.
-3. Whether manual score correction is allowed during sudden death.
-4. Exact goal anti-double-score and ball-ownership implementation.
-5. Whether full cleanup needs its own separate button or a longer Reset confirmation.
+1. Exact announcement timing for start and lock messages.
+2. Whether manual score correction is allowed during sudden death.
+3. Exact goal anti-double-score and ball-ownership implementation.
+4. Whether full cleanup needs its own separate button or a longer Reset confirmation.
 
 ## Do not do yet
 
