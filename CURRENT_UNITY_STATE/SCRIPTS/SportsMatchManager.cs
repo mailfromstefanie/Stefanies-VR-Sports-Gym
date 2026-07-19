@@ -77,6 +77,16 @@ namespace StefanieInVR
 
         private bool initialized;
 
+        [Header("Temporary Debug - Read Only")]
+        [SerializeField]
+        private int debugLocalPlayerTeam = TEAM_NONE;
+
+        [SerializeField]
+        private int debugRedPlayerCount;
+
+        [SerializeField]
+        private int debugBluePlayerCount;
+
         private void Start()
         {
             if (Networking.IsOwner(gameObject))
@@ -86,11 +96,13 @@ namespace StefanieInVR
             }
 
             initialized = true;
+            RefreshDebugValues();
         }
 
         public override void OnDeserialization()
         {
             initialized = true;
+            RefreshDebugValues();
         }
 
         public override void OnPlayerLeft(VRCPlayerApi player)
@@ -106,6 +118,7 @@ namespace StefanieInVR
 
             if (removed)
             {
+                RefreshDebugValues();
                 RequestSerialization();
             }
         }
@@ -144,6 +157,7 @@ namespace StefanieInVR
 
             if (removed)
             {
+                RefreshDebugValues();
                 RequestSerialization();
             }
         }
@@ -196,6 +210,7 @@ namespace StefanieInVR
             }
 
             targetIds[emptySlot] = playerId;
+            RefreshDebugValues();
             RequestSerialization();
         }
 
@@ -252,6 +267,36 @@ namespace StefanieInVR
             }
 
             return removed;
+        }
+
+        private void RefreshDebugValues()
+        {
+            debugRedPlayerCount = CountPlayers(redPlayerIds);
+            debugBluePlayerCount = CountPlayers(bluePlayerIds);
+
+            VRCPlayerApi localPlayer = Networking.LocalPlayer;
+            debugLocalPlayerTeam = IsValidPlayer(localPlayer)
+                ? GetPlayerTeam(localPlayer.playerId)
+                : TEAM_NONE;
+        }
+
+        private int CountPlayers(int[] playerIds)
+        {
+            if (playerIds == null)
+            {
+                return 0;
+            }
+
+            int count = 0;
+            for (int i = 0; i < playerIds.Length; i++)
+            {
+                if (playerIds[i] != EMPTY_PLAYER_SLOT)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private void InitializeOwnerSnapshot()
