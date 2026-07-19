@@ -126,3 +126,26 @@ Ownership transfer and manual serialization are working for Join, Switch and Lea
 
 ### Next step
 Run a three-client late-joiner test: register two players first, then add a third client and verify that it reconstructs both existing team lists without anyone pressing Join again.
+
+## 2026-07-19 — Three-client late-joiner reconstruction passed
+
+### Test setup
+- Client A and client B registered in the existing Red and Blue teams.
+- Client C joined only after those registrations had already synchronized.
+
+### Results
+- Client C immediately displayed both existing team lists.
+- Neither A nor B needed to press a Join button again.
+- An existing player then switched team.
+- Clients A, B and C all displayed the same updated Red and Blue lists.
+- No duplicate registration or stale player list was observed.
+
+### Learned
+The synchronized player-ID arrays form a sufficient reconstructable snapshot for late joiners. `OnDeserialization()` and the event-driven view refresh rebuild the same visible names on every client without per-frame polling.
+
+### Deliberately not built yet
+- No completed registered-player departure cleanup test.
+- No score, timer, goals, reset confirmation, audio, particles or SoccerBox football changes.
+
+### Next step
+Test instance departure cleanup and ownership continuity: close a registered manager owner, verify that the departed name is removed, and confirm the remaining clients can still Join, Switch and Leave.
