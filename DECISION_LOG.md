@@ -203,3 +203,33 @@ The manager checks the requesting player, permissions and current match phase be
 For an accepted action, the requesting player takes ownership of the `SportsMatchManager`. After ownership is confirmed, all synchronized values belonging to that action are changed together and `RequestSerialization()` is called once.
 
 **Reason:** This prevents partial updates, avoids needless ownership changes for invalid actions and keeps one clear serialization point.
+
+## D-031 — Team registrations use player-ID slots and clean up departures
+**Status:** Accepted
+
+Red and Blue use fixed-size synchronized integer arrays containing VRChat player IDs, with `-1` representing an empty slot. Visible names are rebuilt locally from those IDs.
+
+When a registered player leaves the instance, the manager owner removes that ID and serializes the cleaned lists. The match does not automatically reset or stop, even when one team becomes empty.
+
+## D-032 — Countdown uses one shared network end timestamp
+**Status:** Accepted
+
+Starting a match stores one synchronized network end timestamp. Every client and late joiner calculates the displayed remaining time locally.
+
+Only the current manager owner processes the transition at zero and synchronizes either the winner or `SUDDEN_DEATH` state.
+
+## D-033 — Goals have detector-level and manager-level duplicate protection
+**Status:** Accepted
+
+Goal detectors react only to the configured football and must observe it leave before reporting another entry. The manager accepts reports only during `PLAYING` or `SUDDEN_DEATH` and immediately changes phase before further processing.
+
+This ensures that bouncing, multiple colliders or repeated trigger callbacks cannot award multiple points for one goal.
+
+## D-034 — Football reset preserves the SoccerBox system
+**Status:** Accepted
+
+The scoreboard does not replace or reconfigure the SoccerBox football, `SBBall`, child `BallTrigger`, Rigidbody physics or synchronization path. It does not add `VRC Object Sync` and does not convert the ball into a pickup.
+
+After an accepted goal, the processor takes ownership of the football root, clears linear and angular velocity, moves it to the centre anchor and sends the reset through the existing `SBBall` synchronization path. The goal pause temporarily blocks scoring and interaction without permanently changing the established football physics.
+
+The exact script calls and safest temporary blocking method must be proven in a small isolated test before modifying the working football.
