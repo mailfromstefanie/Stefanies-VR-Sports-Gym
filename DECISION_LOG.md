@@ -134,3 +134,12 @@ The new first-release match manager will not support a `No Limit` match mode. Of
 Visitors who only want to kick the ball around casually do not need to start an official match. They may use the existing manual score controls to keep an informal score without activating the timed match system.
 
 **Reason:** A separate unlimited mode adds unnecessary state and UI complexity while casual play already works without it.
+
+## D-024 — Short status messages clear after about two seconds
+**Status:** Accepted
+
+Brief confirmations such as `GAME STARTED`, `TEAMS LOCKED` and `TEAM SWITCHING OPEN` remain visible in the shared announcement panel for about two seconds and then clear automatically.
+
+Persistent state stays visible on the relevant control itself. Important messages such as `NEXT GOAL WINS`, reset confirmation and the final winner follow their own longer display rules.
+
+**Reason:** The announcement panel must give clear feedback without becoming occupied when a goal, warning or important match-state message needs to appear.
