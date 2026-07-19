@@ -44,8 +44,6 @@ Registered players choose their own team through separate `Join Red` and `Join B
 
 **Reason:** Stef wants players to decide which side they play for. The UI can use the accepted configurable action-button pattern.
 
-**Boundary:** Empty-team rules are still being designed.
-
 ## D-007 — Current release match scope is Soccer and Soccer Hockey
 **Status:** Accepted
 
@@ -93,3 +91,12 @@ Only a player who is already registered in Red or Blue may toggle `Allow Team Sw
 **Reason:** The people already playing control whether the running match admits or moves players. This keeps the system social without allowing an outsider to disrupt the match.
 
 **Boundary:** Any registered player may operate the control; there is no separate captain role in the first release.
+
+## D-013 — Both teams require a player before start
+**Status:** Accepted
+
+`Start Game` succeeds only when Red has at least one registered player and Blue has at least one registered player. If either team is empty, the manager refuses to start the match and shows a short status message.
+
+**Reason:** This prevents accidental empty or one-sided matches and makes the start condition clear to everyone.
+
+**Preferred status text:** `Both teams need a player`.
