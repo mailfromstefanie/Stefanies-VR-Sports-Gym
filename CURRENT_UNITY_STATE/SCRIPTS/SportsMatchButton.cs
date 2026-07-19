@@ -6,20 +6,18 @@ namespace StefanieInVR
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SportsMatchButton : UdonSharpBehaviour
     {
-        public enum MatchAction
-        {
-            JoinRed,
-            JoinBlue,
-            LeaveGame
-        }
+        public const int ACTION_JOIN_RED = 0;
+        public const int ACTION_JOIN_BLUE = 1;
+        public const int ACTION_LEAVE_GAME = 2;
 
         [Header("Manager")]
         [Tooltip("De centrale SportsMatchManager.")]
         public SportsMatchManager sportsMatchManager;
 
         [Header("Action")]
-        [Tooltip("Kies welke actie deze knop naar de manager stuurt.")]
-        public MatchAction action = MatchAction.JoinRed;
+        [Tooltip("0 = Join Red, 1 = Join Blue, 2 = Leave Game")]
+        [Range(0, 2)]
+        public int action = ACTION_JOIN_RED;
 
         public override void Interact()
         {
@@ -33,19 +31,19 @@ namespace StefanieInVR
                 return;
             }
 
-            if (action == MatchAction.JoinRed)
+            if (action == ACTION_JOIN_RED)
             {
                 sportsMatchManager.RequestJoinRed();
                 return;
             }
 
-            if (action == MatchAction.JoinBlue)
+            if (action == ACTION_JOIN_BLUE)
             {
                 sportsMatchManager.RequestJoinBlue();
                 return;
             }
 
-            if (action == MatchAction.LeaveGame)
+            if (action == ACTION_LEAVE_GAME)
             {
                 sportsMatchManager.RequestLeaveGame();
             }
