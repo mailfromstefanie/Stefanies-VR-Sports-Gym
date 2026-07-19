@@ -116,3 +116,12 @@ The first valid press of `Reset Game` shows `PRESS RESET AGAIN TO CONFIRM` and s
 When nobody is registered, any visitor may use the same two-press confirmation to restore an abandoned board. A different player cannot complete another player's pending confirmation.
 
 **Reason:** This prevents accidental resets while remaining reliable with ordinary Unity UI buttons in both VR and desktop mode.
+
+## D-022 — Team status UI must explain itself in words
+**Status:** Accepted
+
+The team-switching control automatically displays its current shared state as `TEAM SWITCHING: LOCKED` or `TEAM SWITCHING: OPEN`, with short helper text explaining what pressing it will do. Colour may support the state but may never be the only indicator.
+
+When someone attempts to join or switch while teams are locked, the shared announcement panel briefly shows `TEAMS ARE LOCKED` and `ASK A PLAYER TO OPEN TEAM SWITCHING`.
+
+**Reason:** The scoreboard must be intuitive for visitors using VR for the first time. The manager owns the state; UI text and colours update automatically from that same state.
