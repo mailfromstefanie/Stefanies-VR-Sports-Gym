@@ -163,3 +163,14 @@ The action is available only while no match is active. On the first valid press,
 The shared announcement panel may simultaneously show `CLEAR ALL PLAYERS?` so the action is obvious to first-time VR users.
 
 **Reason:** Confirmation on the button that was already pressed is more intuitive than asking a visitor to find a second confirmation control. Keeping the action separate prevents `Reset Game` from unexpectedly deleting the teams.
+
+## D-027 — One central SportsMatchManager owns all match truth
+**Status:** Accepted
+
+One manually synchronized `SportsMatchManager` is the only source of truth for the complete Soccer and Soccer Hockey match.
+
+It owns team registrations, scores, configured duration, match phase, network timing, team-switching state, winner, shared announcement state and duplicate-goal protection. Buttons, goal detectors and scoreboard visuals do not keep competing synchronized copies of that information.
+
+Small helper behaviours remain separate for input, goal reporting and display refresh.
+
+**Reason:** One ownership and serialization point gives late joiners one coherent snapshot, reduces disagreement between timer, teams and score, and stays easier to debug and explain.
