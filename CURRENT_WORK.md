@@ -6,7 +6,7 @@
 
 ## Current phase
 
-Testing — microstep 6 late-joiner team-list reconstruction.
+Testing — microstep 7 registered-player departure cleanup.
 
 The first-release interaction design and technical architecture are approved.
 
@@ -69,31 +69,37 @@ M3 — Verify synchronized team registration and the smallest scoreboard view.
   - client A switched from Red to Blue without duplicating or removing client B;
   - client A left the game and disappeared on both clients while client B remained registered;
   - ownership transfer did not produce duplicate registrations.
+- Three-client late-joiner reconstruction passed:
+  - client C joined after A and B were already registered;
+  - C immediately reconstructed both existing team lists without a repeated Join action;
+  - after an existing player switched team, A, B and C all displayed the same updated lists.
 
 ## Current microstep
 
-Run only the first late-joiner reconstruction test for team registration and player-list rendering.
+Run only the registered-player departure cleanup test.
 
 Test that:
 
 1. client A joins Red;
 2. client B joins Blue;
-3. a third client joins after both registrations already exist;
-4. client C sees the same Red and Blue names without anyone pressing a button again;
-5. all three clients continue to show the same lists after one existing player switches team.
+3. close the client that currently owns `SportsMatchManager` while that player is still registered;
+4. the departed player's name is removed from the remaining client or clients;
+5. the other registered player remains present;
+6. a remaining player can still Join, Switch and Leave afterward.
 
 Do not add score, timer, goals or reset behaviour during this test.
 
 ## Pass condition
 
-- The late joiner reconstructs the current Red and Blue registrations from synchronized manager state.
-- No existing player must repeat a Join action to make the names appear.
-- All three clients display identical lists after a subsequent team switch.
+- A player who leaves the instance is removed from Red and Blue on all remaining clients.
+- Ownership or master transfer does not freeze the manager.
+- Other registrations remain intact.
+- Join, Switch and Leave still work after the departure.
 - No red Console or Udon errors occur.
 
 ## Not implemented yet
 
-- no completed late-joiner team-list test;
+- no completed registered-player departure cleanup test;
 - no score or timer behaviour;
 - no goals or goal triggers;
 - no reset confirmations;
