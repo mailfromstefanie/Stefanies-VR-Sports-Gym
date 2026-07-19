@@ -174,3 +174,14 @@ It owns team registrations, scores, configured duration, match phase, network ti
 Small helper behaviours remain separate for input, goal reporting and display refresh.
 
 **Reason:** One ownership and serialization point gives late joiners one coherent snapshot, reduces disagreement between timer, teams and score, and stays easier to debug and explain.
+
+## D-028 — Five explicit match phases with plain player-facing wording
+**Status:** Accepted
+
+`SportsMatchManager` uses the internal phases `READY`, `PLAYING`, `GOAL_PAUSE`, `SUDDEN_DEATH` and `FINISHED`.
+
+`SUDDEN_DEATH` is only a technical state name in the script. The scoreboard never expects visitors to understand that term and instead displays the direct instruction `NEXT GOAL WINS`.
+
+Reset confirmation and Clear All Players confirmation are temporary confirmation data, not extra match phases.
+
+**Reason:** Explicit internal phases keep scoring, timing and ball-reset logic reliable, while plain visible wording keeps the experience intuitive for first-time VR users.
