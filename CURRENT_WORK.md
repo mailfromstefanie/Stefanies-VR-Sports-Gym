@@ -6,13 +6,13 @@
 
 ## Current phase
 
-Implementation — microstep 1 compile test.
+Implementation — microstep 2 manager component setup.
 
 The first-release interaction design and technical architecture are approved.
 
 ## Current milestone
 
-M3 — Introduce the smallest compiling `SportsMatchManager` foundation without connecting gameplay yet.
+M3 — Introduce and verify the smallest working `SportsMatchManager` foundation without connecting gameplay yet.
 
 ## Confirmed project setup
 
@@ -38,16 +38,23 @@ M3 — Introduce the smallest compiling `SportsMatchManager` foundation without 
 - `SportsMatchButton` will use an Inspector-selected action and keep no match state.
 - `SportsScoreboardView` will render all texts and visuals from manager state.
 
-## Built in the current microstep
+## Completed microstep
 
-Created `CURRENT_UNITY_STATE/SCRIPTS/SportsMatchManager.cs` with:
+`SportsMatchManager.cs` was imported into Unity and compiled successfully with no red Console errors.
 
-- the approved phase, team and empty-slot constants;
-- the approved synchronized snapshot fields;
-- Red and Blue player-ID arrays;
-- owner-only initial state setup;
-- one initial `RequestSerialization()` call;
-- read-only getter methods for later helpers.
+## Current microstep
+
+1. Create one empty GameObject named `SportsMatchManager`.
+2. Keep its Transform at position `0,0,0`, rotation `0,0,0`, scale `1,1,1`.
+3. Add the `SportsMatchManager` UdonSharp component.
+4. Do not connect buttons, texts, football, goals or other objects.
+5. Inspect the component and capture a screenshot before entering Play Mode.
+
+## Pass condition
+
+- The component can be added without a missing-script warning.
+- The Inspector shows the default match duration as `600` seconds.
+- No new red Console errors appear.
 
 ## Not implemented yet
 
@@ -57,24 +64,4 @@ Created `CURRENT_UNITY_STATE/SCRIPTS/SportsMatchManager.cs` with:
 - no goals or goal triggers;
 - no reset confirmations;
 - no audio or particles;
-- no SoccerBox football changes;
-- no Unity hierarchy changes.
-
-## Current test
-
-1. Bring the new `SportsMatchManager.cs` file into the Unity project.
-2. Wait until Unity and UdonSharp finish compiling.
-3. Do not add it to a GameObject yet.
-4. Check the Console for red errors.
-
-## Pass condition
-
-Unity finishes compiling with no red error caused by `SportsMatchManager.cs`.
-
-## Failure evidence
-
-If an error appears, capture the complete first red Console error, including file name, line number and message.
-
-## Next step after a pass
-
-Create one empty manager GameObject, add `SportsMatchManager`, inspect its fields, and perform a local initialization test before connecting any button.
+- no SoccerBox football changes.
