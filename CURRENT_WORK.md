@@ -84,7 +84,10 @@ Do not copy the original random team assignment. The Sports Gym uses explicit `J
 - Goals count only while the match is active.
 - Accepted score changes are synchronized.
 - Late joiners and rejoining players reconstruct the current score, timer, teams, lock state and match status.
-- At time expiry, the winner is shown with text, particles and cheering audio.
+- At time expiry with unequal scores, the leading team wins immediately.
+- At time expiry with equal scores, the timer stays at `00:00` and the match enters sudden death.
+- In sudden death, the next valid goal immediately determines the winner.
+- Winner presentation uses text, particles and cheering audio.
 
 ### Registration and teams
 
@@ -93,7 +96,7 @@ Do not copy the original random team assignment. The Sports Gym uses explicit `J
 - Player names are available for team lists and the result.
 - Before match start, players may choose or change teams.
 - `Start Game` requires at least one registered player in Red and at least one in Blue.
-- If either team is empty, start is refused and a short status such as `Both teams need a player` is shown.
+- If either team is empty, start is refused and `Both teams need a player` is shown.
 - A successful start locks both teams.
 - While locked, new players cannot join and registered players cannot switch.
 - `Allow Team Switching` temporarily opens joining and switching during an active match.
@@ -125,7 +128,7 @@ The UI should display manager state and should not store independent game state.
 Proposed, not yet approved for implementation:
 
 - `SportsModeManager` remains the sport-mode truth.
-- One generic match manager becomes truth for registered players, teams, team lock, timer, score and result.
+- One generic match manager becomes truth for registered players, teams, team lock, timer, score, sudden-death state and result.
 - Two goal detectors report only which goal the football entered.
 - One configurable action-button behaviour requests actions such as Join Red, Join Blue, Leave, Start, Reset and Allow Team Switching.
 - Scoreboard visuals only render manager state.
@@ -134,14 +137,19 @@ Proposed, not yet approved for implementation:
 
 Decide this next:
 
-**What happens when the score is equal when the timer reaches zero?**
+**Who may press `Start Game` and `Reset Game`?**
 
 Small options:
 
-- finish immediately as `Draw`;
-- continue with sudden death, where the next valid goal wins.
+- any visitor;
+- any registered Red or Blue player;
+- only the player who currently owns the match manager;
+- only instance master or configured admins.
 
-Recommended first-release rule: finish as `Draw`. It is simpler, predictable and avoids a match continuing indefinitely.
+Recommended first-release rule:
+
+- `Start Game`: any registered Red or Blue player;
+- `Reset Game`: any registered Red or Blue player, but require a deliberate confirmation or hold action later to reduce accidents.
 
 Discuss only this question next.
 
@@ -149,14 +157,13 @@ Discuss only this question next.
 
 After the current question is resolved, discuss one at a time:
 
-1. Who may start or reset a match.
-2. Exact goal anti-double-score behaviour.
-3. Ball reset behaviour after a goal.
-4. Exact winner text and player-name presentation.
-5. Whether team membership persists after a completed match.
-6. Whether Reset Game needs confirmation.
-7. How the UI visually shows locked and open teams.
-8. Whether No Limit remains in the first release.
+1. Exact goal anti-double-score behaviour.
+2. Ball reset behaviour after a goal.
+3. Exact winner text and player-name presentation.
+4. Whether team membership persists after a completed match.
+5. Whether Reset Game needs confirmation.
+6. How the UI visually shows locked, open and sudden-death states.
+7. Whether No Limit remains in the first release.
 
 ## Risks
 
@@ -173,7 +180,7 @@ After the current question is resolved, discuss one at a time:
 
 Answer only:
 
-At equal score when time expires, should the match end as a draw or continue into sudden death?
+Who may press `Start Game` and `Reset Game`?
 
 No Unity changes are needed yet.
 
