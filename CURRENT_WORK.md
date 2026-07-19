@@ -36,7 +36,7 @@ Key accepted rules:
 - Start requires at least one player in both teams.
 - A timed match locks teams unless a registered player enables team switching.
 - Goals, score, timer, teams, match state and lock state are shared and reconstruct correctly for late joiners.
-- At equal score and `00:00`, sudden death begins and the next physical goal wins.
+- At equal score and `00:00`, sudden death begins and the scoreboard shows `NEXT GOAL WINS`.
 - A normal goal shows the scoring team, plays a sound, blocks duplicate scoring, resets the ball to centre and pauses for about two seconds.
 - The winner message is only `RED TEAM WINS` or `BLUE TEAM WINS`.
 - Normal Reset Game preserves both team lists and uses a same-player, two-press confirmation.
@@ -62,58 +62,61 @@ Key accepted rules:
 
 One manually synchronized UdonSharp behaviour is the only source of truth for the complete match.
 
-It owns:
+Small helper behaviours remain separate:
 
-- Red and Blue registered player IDs;
-- Red and Blue scores;
-- configured match duration;
-- match phase;
-- network start timestamp;
-- team-switching lock state;
-- winner state;
-- shared announcement state;
-- goal/reset lock state needed to prevent duplicate scoring.
-
-Other components do not store competing synchronized copies of this truth.
-
-### Small helper behaviours
-
-- `SportsMatchButton`: sends one Inspector-selected action request to `SportsMatchManager`.
-- `SportsGoalDetector`: reports whether the Red or Blue goal was entered.
-- `SportsScoreboardView`: reads manager state and refreshes TMP texts, button labels, colours and visibility.
-- Ball reset remains commanded by the manager through the configured football Rigidbody, VRC Object Sync and centre anchor; whether a tiny dedicated helper is needed will be decided from the actual ball setup.
+- `SportsMatchButton` sends one Inspector-selected action request.
+- `SportsGoalDetector` reports which goal was entered.
+- `SportsScoreboardView` refreshes TMP texts, labels, colours and visibility from manager state.
+- The manager commands the football reset through its configured Rigidbody, VRC Object Sync and centre anchor.
 
 ### Explicit match phases
 
 `SportsMatchManager` uses five internal phases:
 
-1. `READY` — no official match is running; players may join and manual score controls may be used.
-2. `PLAYING` — timer is running and valid goals count.
-3. `GOAL_PAUSE` — a normal goal has counted; duplicate goals are blocked while the ball resets for about two seconds.
-4. `SUDDEN_DEATH` — timer is at zero, score is tied and only the next physical goal may decide the match.
-5. `FINISHED` — winner is fixed; scoring and match controls remain blocked until Reset Game.
+1. `READY` — no official match is running.
+2. `PLAYING` — timer runs and valid goals count.
+3. `GOAL_PAUSE` — a normal goal has counted and duplicate goals are blocked while the ball resets.
+4. `SUDDEN_DEATH` — internal technical name only; visitors see `NEXT GOAL WINS`.
+5. `FINISHED` — winner is fixed until Reset Game.
 
-`SUDDEN_DEATH` is only an internal code/state name. Visitors never need to understand that term. The scoreboard displays the plain instruction `NEXT GOAL WINS` for that phase.
+Reset and Clear All Players confirmations are temporary confirmation data, not match phases.
 
-Reset confirmation and Clear All Players confirmation remain temporary confirmation data, not extra match phases.
+### Approved synchronized snapshot
+
+The manager synchronizes only the shared values needed to reconstruct one coherent match:
+
+- match phase;
+- Red score;
+- Blue score;
+- configured match duration in seconds;
+- network end timestamp for the active countdown;
+- team-switching open/locked state;
+- winner team;
+- Red registered player IDs;
+- Blue registered player IDs;
+- current persistent announcement type;
+- announcement sequence number so one-shot presentation can be recognized;
+- goal-pause end timestamp while the football is blocked.
+
+The visible countdown is calculated locally from the shared network end timestamp. The timer therefore does not need to serialize every second.
+
+Temporary hover visuals and ordinary local redraw data are not synchronized. Confirmation authority is still validated by the manager.
 
 ## Current architecture question
 
-**Which exact values need to be synchronized so every player and late joiner reconstructs the same match?**
+**How should button actions safely change the synchronized manager?**
 
-Recommended first-release synchronized snapshot:
+Recommended first-release ownership rule:
 
-- match phase;
-- Red score and Blue score;
-- configured duration in seconds;
-- network end timestamp for the running timer;
-- team-switching open/locked state;
-- winner team;
-- Red and Blue registered player IDs;
-- current persistent announcement type and its sequence number;
-- goal-pause end timestamp when the ball is temporarily blocked.
+1. A player presses a `SportsMatchButton`.
+2. The button sends the selected action and the local player identity to `SportsMatchManager`.
+3. The manager first checks permission and current match phase.
+4. For an allowed action, the local player takes ownership of the manager object.
+5. Only after ownership is confirmed does the manager change its fields.
+6. The manager calls `RequestSerialization()` once after the complete accepted change.
+7. Rejected actions do not take ownership and do not serialize match state; they only show the appropriate feedback.
 
-Local-only temporary data should include button hover visuals, local countdown drawing and a player's own pending confirmation display where possible. Confirmation authority still has to be checked by the manager.
+This keeps one clear ownership target and avoids partially synchronized changes.
 
 Discuss only this decision next.
 
@@ -121,14 +124,13 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. ownership and serialization rules for button actions;
-2. team-registration storage and player-leave cleanup;
-3. network-time countdown and late-join reconstruction;
-4. goal validation and anti-double-score flow;
-5. football ownership, reset and Rigidbody handling;
-6. announcements, audio and particle event reconstruction;
-7. configurable button actions and automatic view refresh;
-8. smallest build-and-test order.
+1. team-registration storage and player-leave cleanup;
+2. network-time countdown and late-join reconstruction;
+3. goal validation and anti-double-score flow;
+4. football ownership, reset and Rigidbody handling;
+5. announcements, audio and particle event reconstruction;
+6. configurable button actions and automatic view refresh;
+7. smallest build-and-test order.
 
 ## Do not do yet
 
