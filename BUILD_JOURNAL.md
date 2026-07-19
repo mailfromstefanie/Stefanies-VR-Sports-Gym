@@ -48,13 +48,23 @@ Inspect the first existing sport-mode script without editing it.
 - Replaced the nested enum with an Inspector integer action: `0 = Join Red`, `1 = Join Blue`, `2 = Leave Game`.
 - Stef imported the corrected version and it compiled without red errors.
 
+### Temporary debug visibility
+- Added read-only Inspector debug fields for local team, Red player count and Blue player count.
+- The temporary fields refresh after initialization, deserialization and accepted team changes.
+
+### Local team registration test result
+- `Join Red` produced local team `1`, Red count `1`, Blue count `0`.
+- `Join Blue` moved the same player cleanly to local team `2`, Red count `0`, Blue count `1`.
+- `Leave Game` returned all three values to `0, 0, 0`.
+- No duplicate registration was observed.
+
 ### Deliberately not built yet
-- No real scoreboard button is connected.
-- No scoreboard view or player-name rendering exists yet.
+- No real scoreboard player-name rendering exists yet.
+- No two-client synchronization test has been completed yet.
 - No score, timer, goal, reset, audio, particles or SoccerBox football changes exist yet.
 
 ### Learned
-The current UdonSharp version requires the action selector to avoid nested enum declarations. The corrected small helper compiles and is ready for an isolated Unity button test.
+The manager-side team registration flow and `SportsMatchButton` actions work locally in ClientSim. The next smallest step is rendering synchronized Red and Blue player names through one scoreboard view.
 
 ### Next step
-Create one temporary test button for `Join Red`, connect it to `SportsMatchManager`, and verify the Inspector setup before entering Play Mode.
+Add the first minimal `SportsScoreboardView` that reads the manager and refreshes only the Red and Blue player-name texts.
