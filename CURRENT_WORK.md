@@ -72,12 +72,22 @@ Finish the first-release interaction design before choosing the generic match ar
 - The next valid goal ends the match.
 - Winner presentation uses shared text, particles and cheering audio.
 
-### Goal reset behaviour
+### Accepted goal sequence
 
-- After every accepted goal, the football automatically returns to the centre spot.
-- Goal detection is blocked until the reset is complete.
-- The reset must clear velocity and angular velocity before play resumes.
-- Exact ownership and Rigidbody handling will be designed and tested later.
+After every accepted goal:
+
+1. Add one point to the correct team and synchronize the score.
+2. Block all further goal detection immediately.
+3. Show `GOAL FOR RED TEAM` or `GOAL FOR BLUE TEAM` in the shared announcement panel.
+4. Play a short goal sound for everyone.
+5. Stop the football, clear linear and angular velocity, and move it to the centre spot.
+6. Keep the football unavailable or frozen for about two seconds.
+7. Clear the goal announcement.
+8. Re-enable the football and goal detection for the next kickoff.
+
+If the accepted goal is the deciding sudden-death goal, skip the normal restart and finish the match with the winner presentation instead.
+
+The exact network ownership and Rigidbody reset implementation will be designed and tested later.
 
 ## Existing scoreboard UI
 
@@ -112,17 +122,14 @@ Proposed, not yet approved for implementation:
 
 Decide this next:
 
-**After a goal, should play resume immediately when the ball reaches the centre, or should there be a short kickoff pause?**
+**What exact winner message should appear after the match?**
 
-Recommended first-release rule:
+Recommended first-release format:
 
-- count the goal;
-- show a short `GOAL` message and play the goal sound;
-- reset the ball to centre;
-- wait about two seconds;
-- then allow play to continue.
-
-This gives players time to understand the score and move back into position without making the match slow.
+- first line: `RED TEAM WINS` or `BLUE TEAM WINS`;
+- second line: the registered player names from the winning team;
+- play cheering audio and the winning team's particles;
+- keep the message visible until Reset Game.
 
 Discuss only this question next.
 
@@ -130,13 +137,12 @@ Discuss only this question next.
 
 After the current question is resolved, discuss one at a time:
 
-1. Exact goal anti-double-score implementation.
-2. Exact winner text and player-name presentation.
-3. Whether team membership persists after a completed match.
-4. Exact Reset Game confirmation interaction.
-5. How the UI visually shows locked and open teams.
-6. Whether No Limit remains in the first release.
-7. Exact announcement messages and timing.
+1. Whether team membership persists after a completed match.
+2. Exact Reset Game confirmation interaction.
+3. How the UI visually shows locked and open teams.
+4. Whether No Limit remains in the first release.
+5. Exact announcement timing for start and team-lock messages.
+6. Whether manual score corrections are allowed during sudden death.
 
 ## Risks
 
@@ -151,7 +157,7 @@ After the current question is resolved, discuss one at a time:
 
 Answer only:
 
-Should there be a short pause of about two seconds after a goal before the centred football becomes playable again?
+Should the final announcement show the winning team name plus all registered player names from that team, and remain visible until Reset Game?
 
 No Unity changes are needed yet.
 
