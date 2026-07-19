@@ -36,8 +36,13 @@ Inspect the first existing sport-mode script without editing it.
 - No Join, Leave, score, timer, goal or reset action was implemented.
 - The SoccerBox football was not changed.
 
-### Safety boundary
-This is only the compile-test foundation. The next step must first verify that Unity and UdonSharp import and compile this single script without errors.
+### Compile test result
+- Stef imported `SportsMatchManager.cs` into the Unity project.
+- Unity and UdonSharp completed compilation successfully.
+- No red Console errors were reported.
+
+### Learned
+The foundation script is syntactically valid in the current Unity 2022.3 LTS and UdonSharp project.
 
 ### Next step
-Copy or pull `SportsMatchManager.cs` into the Unity project, let Unity compile, and inspect the Console before adding the manager to the hierarchy.
+Create one empty GameObject named `SportsMatchManager`, add the compiled component, inspect the default fields and perform a local initialization test before connecting any button.
