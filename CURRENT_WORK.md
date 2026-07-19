@@ -38,6 +38,8 @@ M1 — Define the smallest reliable shared match system for Soccer and Soccer Ho
 - `No Limit` is not part of the first release.
 - Visitors who only want to play casually can leave the official match unstarted and use the manual score controls to keep their own score.
 - The timer, end buzzer and sudden death belong only to a formally started timed match.
+- Manual score correction remains available before a match and during normal timed play.
+- Manual score correction is disabled during sudden death; only a valid physical goal may decide the winner.
 
 ### Players, teams and permissions
 
@@ -153,22 +155,22 @@ Proposed, not yet approved for implementation:
 
 ## Current design question
 
-**May the manual score-correction buttons change the score during sudden death?**
+**How should a complete cleanup that removes all registered players be triggered?**
 
 Recommended first-release rule:
 
-- disable manual score correction during sudden death;
-- the next accepted physical goal must decide the match;
-- manual corrections remain available before a match and during normal timed play for fixing mistakes.
+- keep normal `Reset Game` for rematches and preserve both team lists;
+- add a separate clearly named `CLEAR ALL PLAYERS` action;
+- require the same two-press confirmation pattern;
+- allow it only when no match is active, or after the match has already been reset.
 
-This prevents someone from accidentally or deliberately ending sudden death through the scoreboard instead of through play.
+This prevents a normal rematch reset from unexpectedly deleting both teams.
 
 Discuss only this question next.
 
 ## Remaining open questions
 
 1. Exact goal anti-double-score and ball-ownership implementation.
-2. Whether full cleanup needs its own separate button or a longer Reset confirmation.
 
 ## Do not do yet
 
