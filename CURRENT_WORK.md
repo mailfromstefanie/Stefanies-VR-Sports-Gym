@@ -46,7 +46,6 @@ M1 — Define the smallest reliable shared match system for Soccer and Soccer Ho
 - Only a registered Red or Blue player may operate that control.
 - When players are registered, only registered players may Start or Reset.
 - When nobody is registered, any visitor may restore an abandoned board.
-- Reset needs a deliberate confirmation or hold interaction.
 
 ### End of time
 
@@ -93,6 +92,16 @@ The winner presentation also uses:
 - Players leave through `Leave Game` or switch teams only while team switching is allowed.
 - A separate full cleanup may clear all registrations when the group deliberately wants new teams or an abandoned board must be restored.
 
+### Reset confirmation
+
+- The first valid press of `Reset Game` does not reset immediately.
+- It shows `PRESS RESET AGAIN TO CONFIRM` in the shared announcement panel.
+- The same player must press `Reset Game` again within about five seconds.
+- The second press performs the reset.
+- If five seconds pass, the confirmation expires and nothing changes.
+- When nobody is registered, any visitor may use the same two-press confirmation to restore an abandoned board.
+- A different player cannot complete another player's pending confirmation.
+
 ## Existing scoreboard UI
 
 Stef has already created:
@@ -119,27 +128,23 @@ Proposed, not yet approved for implementation:
 
 ## Current design question
 
-**How should Reset Game be confirmed so an active match cannot be erased accidentally?**
+**How should the scoreboard show whether teams are locked or open for joining and switching?**
 
 Recommended first-release rule:
 
-- first press shows `PRESS RESET AGAIN TO CONFIRM` in the announcement panel;
-- the same registered player must press Reset again within about five seconds;
-- otherwise the confirmation expires and nothing changes;
-- when nobody is registered, any visitor may use the same two-press confirmation to restore an abandoned board.
-
-This is simpler and more reliable for both desktop and VR than requiring a physical hold gesture through a normal Unity UI button.
+- while teams are locked, show `TEAMS LOCKED` briefly when someone attempts to join or switch;
+- while switching is enabled, keep `TEAM SWITCHING ALLOWED` visible in the announcement panel or on the control itself;
+- use the button visual as the persistent indicator, so the main announcement panel remains available for goals and match messages.
 
 Discuss only this question next.
 
 ## Remaining open questions
 
-1. How the UI shows locked and open teams.
-2. Whether No Limit remains in the first release.
-3. Exact announcement timing for start and lock messages.
-4. Whether manual score correction is allowed during sudden death.
-5. Exact goal anti-double-score and ball-ownership implementation.
-6. Whether full cleanup needs its own separate button or a long Reset confirmation.
+1. Whether No Limit remains in the first release.
+2. Exact announcement timing for start and lock messages.
+3. Whether manual score correction is allowed during sudden death.
+4. Exact goal anti-double-score and ball-ownership implementation.
+5. Whether full cleanup needs its own separate button or a longer Reset confirmation.
 
 ## Do not do yet
 
