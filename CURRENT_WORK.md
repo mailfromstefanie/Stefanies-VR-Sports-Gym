@@ -14,96 +14,87 @@ Do not start Unity implementation yet.
 
 M1 — Define the smallest reliable shared match system for Soccer and Soccer Hockey.
 
-## Session goal
-
-Finish the first-release interaction design before choosing the generic match architecture or writing Unity code.
-
 ## Confirmed project setup
 
-- Repository: `mailfromstefanie/Stefanies-VR-Sports-Gym`.
-- Platform: VRChat Worlds.
-- Unity: 2022.3 LTS.
-- Scripting: UdonSharp.
-- The sports hall is nearly complete.
+- Platform: VRChat Worlds, Unity 2022.3 LTS, UdonSharp.
 - Soccer and Soccer Hockey share one football and two goals.
 - Switching between those modes does not reset the match.
 - Existing scripts are under `CURRENT_UNITY_STATE/SCRIPTS/`.
 - Existing screenshots are under `CURRENT_UNITY_STATE/SCREENSHOTS/`.
 - The protected basketball reference is under `REFERENCE_PACKAGES/Basketball/`.
-
-## Existing source-of-truth systems
-
-- `SportsModeManager.cs` remains the synchronized truth for the selected sport mode.
-- `SportsModeButton.cs` only sends input and refreshes its visual.
-- Do not replace these scripts without a separate accepted decision.
+- `SportsModeManager.cs` remains the synchronized sport-mode truth.
 
 ## Accepted match experience
 
 ### Match and scoring
 
-- Soccer and Soccer Hockey share one Red-versus-Blue match.
-- Default game time is ten minutes.
+- Default duration is ten minutes.
 - Ball in Red goal gives Blue one point.
 - Ball in Blue goal gives Red one point.
 - Goals count only while the match is active.
-- Scores and match state are shared for all players and reconstructed for late joiners.
-- Switching sport mode leaves the active match intact.
-- Reset Game is a separate deliberate action.
+- Shared state supports late join and rejoin.
+- Sport-mode switching leaves the match intact.
+- Reset Game is separate and deliberate.
 
-### Players and permissions
+### Players, teams and permissions
 
 - Players choose `Join Red` or `Join Blue`.
 - A player belongs to at most one team.
-- Start requires at least one registered player in each team.
+- Start requires at least one player in both teams.
 - Start locks both teams.
-- New players cannot join and existing players cannot switch while teams are locked.
 - `Allow Team Switching` temporarily opens joining and switching.
-- Only a registered Red or Blue player may toggle that control.
+- Only a registered Red or Blue player may operate that control.
 - When players are registered, only registered players may Start or Reset.
-- When nobody is registered, any visitor may clean up or reset an abandoned board.
+- When nobody is registered, any visitor may restore an abandoned board.
 - Reset needs a deliberate confirmation or hold interaction.
 
-### Time expiry and sudden death
+### End of time
 
-- At `00:00`, a buzzer sounds.
+- At `00:00`, play a buzzer.
 - If one team leads, that team wins.
-- If scores are equal, the timer remains at `00:00` and the match enters sudden death.
-- The shared announcement panel displays `NEXT GOAL WINS`.
+- If tied, timer remains at `00:00` and sudden death begins.
+- Announcement panel shows `NEXT GOAL WINS`.
 - The next valid goal ends the match.
-- Winner presentation uses shared text, particles and cheering audio.
 
-### Accepted goal sequence
+### Goal sequence
 
-After every accepted goal:
+After a normal accepted goal:
 
-1. Add one point to the correct team and synchronize the score.
-2. Block all further goal detection immediately.
-3. Show `GOAL FOR RED TEAM` or `GOAL FOR BLUE TEAM` in the shared announcement panel.
-4. Play a short goal sound for everyone.
-5. Stop the football, clear linear and angular velocity, and move it to the centre spot.
-6. Keep the football unavailable or frozen for about two seconds.
-7. Clear the goal announcement.
-8. Re-enable the football and goal detection for the next kickoff.
+1. Add and synchronize the point.
+2. Block further goal detection.
+3. Show `GOAL FOR RED TEAM` or `GOAL FOR BLUE TEAM`.
+4. Play a shared goal sound.
+5. Stop the ball, clear velocity and angular velocity, and move it to centre.
+6. Hold it unavailable for about two seconds.
+7. Clear the message and resume play.
 
-If the accepted goal is the deciding sudden-death goal, skip the normal restart and finish the match with the winner presentation instead.
+A deciding sudden-death goal skips the normal restart.
 
-The exact network ownership and Rigidbody reset implementation will be designed and tested later.
+### Winner presentation
+
+Accepted final announcement:
+
+- `RED TEAM WINS`, or
+- `BLUE TEAM WINS`.
+
+Do not add player names to the winner message. Player names remain visible only in the normal team lists.
+
+The winner presentation also uses:
+
+- cheering audio;
+- particles for the winning team;
+- a message that remains visible until Reset Game.
 
 ## Existing scoreboard UI
 
 Stef has already created:
 
 - Red and Blue player lists;
-- game timer;
-- Red and Blue scores;
+- timer and team scores;
 - time controls and No Limit;
-- Start Game;
-- Join Red;
-- Join Blue;
-- Leave Game;
-- Reset Game;
+- Start Game, Join Red, Join Blue, Leave Game and Reset Game;
 - manual score correction controls;
-- a large shared announcement panel above the scoreboard.
+- a large shared announcement panel.
 
 UI objects display manager state and do not store independent match state.
 
@@ -114,52 +105,30 @@ Proposed, not yet approved for implementation:
 - `SportsModeManager` remains sport-mode truth.
 - One generic match manager stores players, teams, permissions, timer, scores, sudden death, announcements and result.
 - Two goal detectors report only which goal was entered.
-- One ball reset component or manager reference returns the football to its centre anchor.
+- One ball-reset reference returns the football to a centre anchor.
 - One configurable action-button behaviour routes Inspector-selected actions.
 - Scoreboard visuals only render manager state.
 
 ## Current design question
 
-Decide this next:
+**Should team membership remain after a match finishes, or should the players be removed from Red and Blue automatically?**
 
-**What exact winner message should appear after the match?**
+Recommended first-release rule:
 
-Recommended first-release format:
-
-- first line: `RED TEAM WINS` or `BLUE TEAM WINS`;
-- second line: the registered player names from the winning team;
-- play cheering audio and the winning team's particles;
-- keep the message visible until Reset Game.
+- keep the players registered after the result;
+- Reset Game clears score, timer and result but leaves the teams in place;
+- players can use Leave Game or switch teams before the next start.
 
 Discuss only this question next.
 
 ## Remaining open questions
 
-After the current question is resolved, discuss one at a time:
-
-1. Whether team membership persists after a completed match.
-2. Exact Reset Game confirmation interaction.
-3. How the UI visually shows locked and open teams.
-4. Whether No Limit remains in the first release.
-5. Exact announcement timing for start and team-lock messages.
-6. Whether manual score corrections are allowed during sudden death.
-
-## Risks
-
-- Creating a second source of truth.
-- Double-scoring inside a goal.
-- Incorrect ownership or Rigidbody state during ball reset.
-- Networking failures for late join, rejoin or owner transfer.
-- Accidental reset of an active match.
-- Expanding the generic button system beyond release needs.
-
-## Exact next step for Stef
-
-Answer only:
-
-Should the final announcement show the winning team name plus all registered player names from that team, and remain visible until Reset Game?
-
-No Unity changes are needed yet.
+1. Exact Reset Game confirmation interaction.
+2. How the UI shows locked and open teams.
+3. Whether No Limit remains in the first release.
+4. Exact announcement timing for start and lock messages.
+5. Whether manual score correction is allowed during sudden death.
+6. Exact goal anti-double-score and ball-ownership implementation.
 
 ## Do not do yet
 
