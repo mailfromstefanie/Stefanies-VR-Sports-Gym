@@ -130,3 +130,12 @@ After every accepted goal, the football automatically returns to the centre spot
 **Reason:** This gives players a clear restart, prevents the ball from bouncing inside the goal and being counted twice, and removes the need for a separate respawn action after every score.
 
 **Boundary:** The exact ownership transfer, Rigidbody reset, delay and goal-detector lockout will be chosen and tested during architecture and prototype work.
+
+## D-018 — Goals use a shared announcement, sound and short restart pause
+**Status:** Accepted
+
+After an accepted goal, the shared announcement panel shows `GOAL FOR RED TEAM` or `GOAL FOR BLUE TEAM`, a short goal sound plays for everyone, and the football is reset to the centre with velocity and angular velocity cleared. Goal detection remains blocked and the ball stays unavailable for about two seconds before the next kickoff.
+
+**Reason:** Players immediately understand which team scored, have time to see the updated score, and can reposition before play resumes.
+
+**Boundary:** If the goal decides sudden death, the normal two-second restart is skipped and the match proceeds directly to winner presentation.
