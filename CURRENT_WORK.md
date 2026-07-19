@@ -102,21 +102,32 @@ The visible countdown is calculated locally from the shared network end timestam
 
 Temporary hover visuals and ordinary local redraw data are not synchronized. Confirmation authority is still validated by the manager.
 
+### Approved ownership and serialization rule
+
+For every button action:
+
+1. The manager first checks the requesting player, permissions and current match phase.
+2. Rejected actions do not take ownership and do not serialize match state.
+3. For an allowed action, the requesting player takes ownership of the `SportsMatchManager` object.
+4. Only after ownership is confirmed may the manager change synchronized fields.
+5. All values belonging to that accepted action are changed together.
+6. The manager calls `RequestSerialization()` once after the complete change.
+7. The local and shared views then refresh from the manager state.
+
+This prevents partial updates, keeps one clear ownership target and avoids unnecessary ownership changes for invalid input.
+
 ## Current architecture question
 
-**How should button actions safely change the synchronized manager?**
+**How should Red and Blue team registrations be stored, and what should happen when a registered player leaves the VRChat instance?**
 
-Recommended first-release ownership rule:
+Recommended first-release rule:
 
-1. A player presses a `SportsMatchButton`.
-2. The button sends the selected action and the local player identity to `SportsMatchManager`.
-3. The manager first checks permission and current match phase.
-4. For an allowed action, the local player takes ownership of the manager object.
-5. Only after ownership is confirmed does the manager change its fields.
-6. The manager calls `RequestSerialization()` once after the complete accepted change.
-7. Rejected actions do not take ownership and do not serialize match state; they only show the appropriate feedback.
-
-This keeps one clear ownership target and avoids partially synchronized changes.
+- store VRChat player IDs in fixed-size synchronized integer arrays for Red and Blue;
+- use `-1` for an empty slot;
+- derive visible player names locally from those IDs whenever the scoreboard refreshes;
+- when a registered player leaves the instance, the current manager owner removes that player ID from the correct team and serializes the cleaned lists;
+- leaving the instance never cancels the whole match automatically;
+- if one team becomes empty during an active match, the match continues until players deliberately reset it.
 
 Discuss only this decision next.
 
@@ -124,13 +135,12 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. team-registration storage and player-leave cleanup;
-2. network-time countdown and late-join reconstruction;
-3. goal validation and anti-double-score flow;
-4. football ownership, reset and Rigidbody handling;
-5. announcements, audio and particle event reconstruction;
-6. configurable button actions and automatic view refresh;
-7. smallest build-and-test order.
+1. network-time countdown and late-join reconstruction;
+2. goal validation and anti-double-score flow;
+3. football ownership, reset and Rigidbody handling;
+4. announcements, audio and particle event reconstruction;
+5. configurable button actions and automatic view refresh;
+6. smallest build-and-test order.
 
 ## Do not do yet
 
