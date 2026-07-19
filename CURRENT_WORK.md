@@ -25,6 +25,7 @@ M2 — Approve the smallest reliable technical architecture for the shared Socce
 - Existing screenshots are under `CURRENT_UNITY_STATE/SCREENSHOTS/`.
 - The protected basketball reference is under `REFERENCE_PACKAGES/Basketball/`.
 - `SportsModeManager.cs` remains the synchronized sport-mode truth and is not replaced by the scoreboard system.
+- The current football is a SoccerBox ball with its own `SBBall` manual synchronization and a child `BallTrigger` interaction.
 
 ## Approved first-release experience
 
@@ -67,7 +68,7 @@ Small helper behaviours remain separate:
 - `SportsMatchButton` sends one Inspector-selected action request.
 - `SportsGoalDetector` reports which goal was entered.
 - `SportsScoreboardView` refreshes TMP texts, labels, colours and visibility from manager state.
-- The manager commands the football reset through its configured Rigidbody, VRC Object Sync and centre anchor.
+- The manager commands the football reset without replacing the SoccerBox synchronization system.
 
 ### Explicit match phases
 
@@ -140,23 +141,30 @@ For every button action:
 - Any later trigger report while the manager is in another phase is ignored.
 - The detector must see the football leave its trigger before that same ball can produce another entry report.
 
-This provides two independent protections: local trigger re-entry protection and central match-phase protection.
+### Approved SoccerBox-safe football reset
+
+- Keep the existing SoccerBox football root, `SBBall`, child `BallTrigger`, Rigidbody settings and strong football physics intact.
+- Do not add `VRC Object Sync`.
+- Do not convert the football into a pickup.
+- The accepted goal processor takes ownership of the football root before changing it.
+- Linear and angular velocity are set to zero and the football is moved to a configured centre anchor.
+- The reset is then sent through the existing SoccerBox `SBBall` synchronization path.
+- `GOAL_PAUSE` blocks further goals and ball interaction for about two seconds without permanently altering the football physics.
+- After the pause, the existing SoccerBox behaviour resumes unchanged.
+- A deciding sudden-death goal may keep the ball blocked until Reset Game.
+- The exact method calls and temporary blocking technique must be verified in a microstep prototype before touching the working football.
 
 ## Current architecture question
 
-**How should football ownership and the physical reset work after an accepted goal?**
+**How should announcements, sounds and winner particles behave for current players and late joiners?**
 
 Recommended first-release rule:
 
-1. The player who successfully processes the goal becomes owner of both `SportsMatchManager` and the football.
-2. The football is forcibly dropped if someone is holding it.
-3. Its Rigidbody linear velocity and angular velocity are set to zero.
-4. The ball is moved to a configured centre anchor with a fixed reset rotation.
-5. During `GOAL_PAUSE`, the ball remains frozen and unavailable for about two seconds.
-6. At the shared goal-pause end time, the manager owner releases the freeze, changes the phase back to `PLAYING` and serializes once.
-7. A sudden-death winning goal changes directly to `FINISHED`; the ball may remain frozen at centre until Reset Game.
-
-The exact Unity components on the current football must be inspected before implementation. This decision approves the behaviour, not a specific script call yet.
+- persistent visual state comes from synchronized manager data;
+- late joiners reconstruct `NEXT GOAL WINS` and the final winner message;
+- brief goal sounds, buzzers and cheering use an incrementing synchronized event sequence so each current client plays them once;
+- a late joiner does not replay an old goal sound or old buzzer merely because they joined later;
+- winner particles may reconstruct from `FINISHED` and winner team, but audio should only play when the winning event is newly received.
 
 Discuss only this decision next.
 
@@ -164,16 +172,15 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. announcements, audio and particle event reconstruction;
-2. configurable button actions and automatic view refresh;
-3. smallest build-and-test order.
+1. configurable button actions and automatic view refresh;
+2. smallest build-and-test order.
 
 ## Do not do yet
 
 - Do not create `SportsMatchManager`.
 - Do not create goal triggers.
 - Do not alter the football.
-- Do not edit basketball scripts or prefabs.
+- Do not edit SoccerBox or basketball scripts or prefabs.
 - Do not create or connect action buttons.
 - Do not add synchronized variables in Unity.
 - Do not alter the Unity hierarchy.
