@@ -44,7 +44,7 @@ Registered players choose their own team through separate `Join Red` and `Join B
 
 **Reason:** Stef wants players to decide which side they play for. The UI can use the accepted configurable action-button pattern.
 
-**Boundary:** Rules for switching teams, empty teams and locking team changes during play are still being designed.
+**Boundary:** Empty-team rules and permissions for reopening teams are still being designed.
 
 ## D-007 — Current release match scope is Soccer and Soccer Hockey
 **Status:** Accepted
@@ -70,3 +70,19 @@ The future match manager must synchronize state changes such as registration, te
 **Reason:** Every player must see the same score, teams, remaining time and match status.
 
 **Boundary:** Exact synced fields and ownership handling will be chosen during architecture design, not during the current interaction-design step.
+
+## D-010 — Match remains active across Soccer and Soccer Hockey switching
+**Status:** Accepted
+
+Changing between Soccer and Soccer Hockey does not automatically cancel or reset an active match. The football, both goals and scoring model are shared between the two modes. Resetting the match is a separate deliberate action.
+
+**Reason:** Tying the match lifetime to the visual mode switch would add unnecessary coupling and could destroy a valid ongoing game.
+
+## D-011 — Teams lock at match start and require explicit reopening
+**Status:** Accepted
+
+When `Start Game` is pressed, Red and Blue lock. While locked, new players cannot enter the active match and registered players cannot switch teams. A shared `Allow Team Switching` control must be enabled before either action becomes possible during the match. Turning it off locks the teams again.
+
+**Reason:** An active match should not silently change because a late visitor presses Join. Reopening teams is a deliberate social decision by the current group.
+
+**Boundary:** The exact player or role allowed to operate `Allow Team Switching`, and how the unlocked state is displayed, remain open design questions.
