@@ -6,13 +6,13 @@
 
 ## Current phase
 
-Implementation — microstep 2 manager component setup.
+Implementation — microstep 3 team registration methods.
 
 The first-release interaction design and technical architecture are approved.
 
 ## Current milestone
 
-M3 — Introduce and verify the smallest working `SportsMatchManager` foundation without connecting gameplay yet.
+M3 — Introduce and verify the smallest working `SportsMatchManager` foundation before connecting UI.
 
 ## Confirmed project setup
 
@@ -38,27 +38,33 @@ M3 — Introduce and verify the smallest working `SportsMatchManager` foundation
 - `SportsMatchButton` will use an Inspector-selected action and keep no match state.
 - `SportsScoreboardView` will render all texts and visuals from manager state.
 
-## Completed microstep
+## Completed microsteps
 
-`SportsMatchManager.cs` was imported into Unity and compiled successfully with no red Console errors.
+- `SportsMatchManager.cs` imported and compiled with no red Console errors.
+- Empty `SportsMatchManager` GameObject created under `GlobalManagers`.
+- Transform and Inspector defaults verified.
+- Local Play Mode initialization test completed with no red Console errors.
 
 ## Current microstep
 
-1. Create one empty GameObject named `SportsMatchManager`.
-2. Keep its Transform at position `0,0,0`, rotation `0,0,0`, scale `1,1,1`.
-3. Add the `SportsMatchManager` UdonSharp component.
-4. Do not connect buttons, texts, football, goals or other objects.
-5. Inspect the component and capture a screenshot before entering Play Mode.
+Add only manager-side methods for:
+
+1. Join Red;
+2. Join Blue;
+3. Leave Game;
+4. player lookup and empty-slot handling;
+5. accepted-action ownership and one serialization request.
+
+Do not create buttons or scoreboard visuals yet. Compile this manager-only change first.
 
 ## Pass condition
 
-- The component can be added without a missing-script warning.
-- The Inspector shows the default match duration as `600` seconds.
-- No new red Console errors appear.
+- Unity and UdonSharp compile the updated manager without red errors.
+- Existing scene behaviour remains unchanged because no UI is connected.
+- No football, goal, timer, score or sport-mode object is modified.
 
 ## Not implemented yet
 
-- no Join Red, Join Blue or Leave Game actions;
 - no buttons or scoreboard view;
 - no score or timer behaviour;
 - no goals or goal triggers;
