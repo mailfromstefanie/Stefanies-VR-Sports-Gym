@@ -6,13 +6,13 @@
 
 ## Current phase
 
-Testing — microstep 7 registered-player departure cleanup.
+Implementation — microstep 8 minimal synchronized score rendering.
 
 The first-release interaction design and technical architecture are approved.
 
 ## Current milestone
 
-M3 — Verify synchronized team registration and the smallest scoreboard view.
+M4 — Begin the smallest synchronized score display without adding match flow yet.
 
 ## Confirmed project setup
 
@@ -73,34 +73,42 @@ M3 — Verify synchronized team registration and the smallest scoreboard view.
   - client C joined after A and B were already registered;
   - C immediately reconstructed both existing team lists without a repeated Join action;
   - after an existing player switched team, A, B and C all displayed the same updated lists.
+- Registered-player departure cleanup passed:
+  - the registered manager owner left the instance;
+  - the departed player was removed from the remaining clients;
+  - the other registration remained intact;
+  - ownership/master transfer did not freeze the manager;
+  - remaining clients could still Join, Switch and Leave afterward.
 
 ## Current microstep
 
-Run only the registered-player departure cleanup test.
+Extend only `SportsScoreboardView` so it can display the manager's existing synchronized Red and Blue score values.
 
-Test that:
+This step may:
 
-1. client A joins Red;
-2. client B joins Blue;
-3. close the client that currently owns `SportsMatchManager` while that player is still registered;
-4. the departed player's name is removed from the remaining client or clients;
-5. the other registered player remains present;
-6. a remaining player can still Join, Switch and Leave afterward.
+1. add one Red score TMP reference;
+2. add one Blue score TMP reference;
+3. render `GetRedScore()` and `GetBlueScore()` during the existing event-driven refresh.
 
-Do not add score, timer, goals or reset behaviour during this test.
+This step must not yet:
+
+- add plus or minus actions;
+- add score permissions;
+- add goals or goal triggers;
+- add timer or match-start behaviour;
+- alter the SoccerBox football.
 
 ## Pass condition
 
-- A player who leaves the instance is removed from Red and Blue on all remaining clients.
-- Ownership or master transfer does not freeze the manager.
-- Other registrations remain intact.
-- Join, Switch and Leave still work after the departure.
-- No red Console or Udon errors occur.
+- Unity and UdonSharp compile without red errors.
+- Both existing score texts show `0` when the view becomes active.
+- Team-name rendering continues to work.
+- No `Update()` loop is introduced.
 
 ## Not implemented yet
 
-- no completed registered-player departure cleanup test;
-- no score or timer behaviour;
+- no score-changing button behaviour;
+- no timer behaviour;
 - no goals or goal triggers;
 - no reset confirmations;
 - no audio or particles;
