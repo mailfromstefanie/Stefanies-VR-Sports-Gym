@@ -154,17 +154,27 @@ For every button action:
 - A deciding sudden-death goal may keep the ball blocked until Reset Game.
 - The exact method calls and temporary blocking technique must be verified in a microstep prototype before touching the working football.
 
+### Approved announcements, audio and particles
+
+- Persistent text is reconstructed from synchronized manager state.
+- Late joiners immediately see persistent states such as `NEXT GOAL WINS` and `RED TEAM WINS` or `BLUE TEAM WINS`.
+- Brief audio and one-shot effects use an incrementing synchronized event sequence.
+- Current players play a newly received goal sound, buzzer or cheer once.
+- Late joiners do not replay an old goal sound, old buzzer or old cheer merely because they entered later.
+- Winner particles reconstruct from `FINISHED` plus the winner team and remain visible until Reset Game.
+
 ## Current architecture question
 
-**How should announcements, sounds and winner particles behave for current players and late joiners?**
+**How should configurable action buttons and scoreboard visuals connect to the manager?**
 
 Recommended first-release rule:
 
-- persistent visual state comes from synchronized manager data;
-- late joiners reconstruct `NEXT GOAL WINS` and the final winner message;
-- brief goal sounds, buzzers and cheering use an incrementing synchronized event sequence so each current client plays them once;
-- a late joiner does not replay an old goal sound or old buzzer merely because they joined later;
-- winner particles may reconstruct from `FINISHED` and winner team, but audio should only play when the winning event is newly received.
+- every existing Unity button gets one small `SportsMatchButton` behaviour;
+- an Inspector dropdown selects the action, such as Join Red, Join Blue, Leave, Start, Reset, Clear All Players, toggle team switching, adjust time or correct a score;
+- the button stores no match state and only requests its selected action from `SportsMatchManager`;
+- one `SportsScoreboardView` reads the manager and refreshes all TMP texts, scores, timer, player lists, helper labels, colours and button visibility;
+- `OnDeserialization`, local accepted actions and timed local display updates all call the same view refresh path;
+- button text such as `TEAM SWITCHING: LOCKED` and `PRESS AGAIN TO CONFIRM` is derived automatically instead of being manually maintained on separate objects.
 
 Discuss only this decision next.
 
@@ -172,8 +182,7 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. configurable button actions and automatic view refresh;
-2. smallest build-and-test order.
+1. smallest build-and-test order.
 
 ## Do not do yet
 
