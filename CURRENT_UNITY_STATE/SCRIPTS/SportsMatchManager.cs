@@ -22,6 +22,10 @@ namespace StefanieInVR
         public const int EMPTY_PLAYER_SLOT = -1;
         public const int MAX_PLAYERS_PER_TEAM = 16;
 
+        [Header("View References")]
+        [SerializeField]
+        private SportsScoreboardView scoreboardView;
+
         [Header("First Release Defaults")]
         [Tooltip("De standaard wedstrijdduur in seconden.")]
         [Min(60)]
@@ -96,13 +100,13 @@ namespace StefanieInVR
             }
 
             initialized = true;
-            RefreshDebugValues();
+            RefreshLocalState();
         }
 
         public override void OnDeserialization()
         {
             initialized = true;
-            RefreshDebugValues();
+            RefreshLocalState();
         }
 
         public override void OnPlayerLeft(VRCPlayerApi player)
@@ -118,7 +122,7 @@ namespace StefanieInVR
 
             if (removed)
             {
-                RefreshDebugValues();
+                RefreshLocalState();
                 RequestSerialization();
             }
         }
@@ -157,7 +161,7 @@ namespace StefanieInVR
 
             if (removed)
             {
-                RefreshDebugValues();
+                RefreshLocalState();
                 RequestSerialization();
             }
         }
@@ -210,8 +214,24 @@ namespace StefanieInVR
             }
 
             targetIds[emptySlot] = playerId;
-            RefreshDebugValues();
+            RefreshLocalState();
             RequestSerialization();
+        }
+
+        private void RefreshLocalState()
+        {
+            RefreshDebugValues();
+            RefreshScoreboardView();
+        }
+
+        private void RefreshScoreboardView()
+        {
+            if (scoreboardView == null)
+            {
+                return;
+            }
+
+            scoreboardView.RefreshView();
         }
 
         private bool TakeLocalOwnership(VRCPlayerApi localPlayer)
@@ -256,7 +276,6 @@ namespace StefanieInVR
             }
 
             bool removed = false;
-
             for (int i = 0; i < playerIds.Length; i++)
             {
                 if (playerIds[i] == playerId)
@@ -304,8 +323,7 @@ namespace StefanieInVR
             matchPhase = PHASE_READY;
             redScore = 0;
             blueScore = 0;
-            configuredDurationSeconds =
-                Mathf.Max(60, defaultMatchDurationSeconds);
+            configuredDurationSeconds = Mathf.Max(60, defaultMatchDurationSeconds);
             networkEndTimeMilliseconds = 0;
             teamSwitchingOpen = true;
             winnerTeam = TEAM_NONE;
