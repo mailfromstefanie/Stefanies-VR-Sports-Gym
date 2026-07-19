@@ -12,11 +12,11 @@ Do not start Unity implementation yet.
 
 ## Current milestone
 
-M1 — Understand the existing sport-mode system, scoreboard UI and protected basketball reference implementation before choosing the generic scoreboard architecture.
+M1 — Define the smallest reliable match system for Soccer and Soccer Hockey using the existing sport-mode system and protected basketball reference patterns.
 
 ## Session goal
 
-Use confirmed evidence from the current Sports Gym setup and the basketball test package to define the smallest useful public-release match experience.
+Finish the first-release interaction design before choosing the generic match architecture or writing Unity code.
 
 ## Confirmed current Sports Gym setup
 
@@ -24,11 +24,15 @@ Use confirmed evidence from the current Sports Gym setup and the basketball test
 - Platform: VRChat Worlds.
 - Unity: 2022.3 LTS.
 - Scripting: UdonSharp.
-- Stef reports that the sports hall and sport games are nearly complete.
-- Existing sport modes are Basketball, Soccer, Volleyball and Soccer Hockey.
+- The sports hall is nearly complete.
+- The current public-release scoreboard scope is now limited to two playable modes:
+  - Soccer;
+  - Soccer Hockey.
+- Both modes use the same football and the same two goals.
+- Switching to Soccer Hockey changes the field setup and enables hockey sticks; players strike the football with the sticks.
 - Current scripts are stored under `CURRENT_UNITY_STATE/SCRIPTS/`.
 - Current hierarchy screenshots are stored under `CURRENT_UNITY_STATE/SCREENSHOTS/`.
-- The current score-board UI already exists in the Sports Gym but is not yet connected to a final generic match system.
+- The current scoreboard UI already exists but is not yet connected to a final match system.
 
 ## Confirmed sport-mode architecture
 
@@ -36,7 +40,7 @@ Use confirmed evidence from the current Sports Gym setup and the basketball test
 
 - Uses manual Udon synchronization.
 - Holds the synchronized active sport-mode index.
-- Supports four sport modes.
+- Supports four sport modes, although the current scoreboard release scope is Soccer and Soccer Hockey.
 - Takes ownership before a player changes the active mode.
 - Activates and deactivates sport-specific and shared object groups.
 - Changes the sports-floor material.
@@ -69,111 +73,104 @@ Detailed read-only findings are stored at:
 
 The original basketball test scene, prefabs and scripts are protected reference material. Stef copied only UI elements into the Sports Gym. Do not modify the original basketball package.
 
-## Confirmed basketball reference behaviour
+## Confirmed reusable basketball patterns
 
-The package contains a full basketball test scene and the main scripts:
+The basketball reference proves these patterns are feasible:
 
-- `BasketBallGrouping.cs`
-- `BasketBallGoal.cs`
-- `BasketBallButtons.cs`
-- `BasketBallBall.cs`
-- `BasketBallPickup.cs`
-- `BasketBallBlock.cs`
-
-### Existing match features
-
-`BasketBallGrouping` already implements:
-
-- a default ten-minute match;
-- configurable match duration;
-- Join and Leave registration;
-- automatic random Red and Blue team assignment on match start;
+- registered players;
 - synchronized player IDs and team assignments;
-- individual player score bookkeeping;
-- calculated team totals;
-- TextMeshPro player names and scores;
-- a synchronized start timestamp based on VRChat network time;
-- a locally reconstructed countdown;
-- finish audio when time expires;
+- player names in UI;
+- one synchronized manager as truth;
+- network-time-based countdown instead of synchronizing every second;
 - late-join serialization support;
-- overhead team tags.
+- buttons as input only;
+- UI as display only;
+- serialization when shared state changes;
+- goal logic reporting points to a manager;
+- one configurable button script using an Inspector enum.
 
-### Existing scoring features
+The basketball implementation itself remains basketball-specific and protected.
 
-`BasketBallGoal` already implements:
+## Accepted first-release match experience
 
-- validated hoop entry;
-- ownership checks;
-- one-, two- and three-point basketball scoring;
-- score assignment to the shooter's team;
-- goal particles;
-- goal audio;
-- synchronized goal effects.
+### Play modes
 
-### Reusable configurable button pattern
+Only Soccer and Soccer Hockey need the new match system for the current release.
+
+Both use:
+
+- one shared football;
+- two goals;
+- the same Red-versus-Blue match structure;
+- the same score manager and goal detection concept.
+
+### Team registration
+
+Stef selected registered players with manual team choice.
+
+The design must support:
+
+- `Join Red`;
+- `Join Blue`;
+- leaving the match;
+- a player belonging to at most one team at a time;
+- registered player names being available for result presentation.
+
+### Match flow
+
+Provisional accepted direction:
+
+1. Players choose Red or Blue.
+2. A Start Game action begins one shared ten-minute match.
+3. The countdown is reconstructed from one synchronized network start time.
+4. Goals count only while the match is active.
+5. When the ball enters Red's goal, Blue receives one point.
+6. When the ball enters Blue's goal, Red receives one point.
+7. The changed score is serialized when a goal is accepted.
+8. Late joiners and rejoining players receive the current shared match state through synchronized variables and deserialization.
+9. At time expiry, the winner is determined and presented with winner text, particles and cheering audio.
+
+### Goal detection direction
+
+A trigger or detection volume inside each goal is a suitable small design direction.
+
+Each goal detector should only report a valid goal event to the central match manager. It should not keep its own independent score.
+
+The exact anti-double-score rule, ball reset behaviour and trigger implementation are not yet final.
+
+## Reusable configurable button pattern
 
 `BasketBallButtons` demonstrates a useful Inspector-driven input pattern:
 
-- each UI button has the same button behaviour;
+- each UI button can use the same button behaviour;
 - Unity UI `On Click` invokes `UdonBehaviour.Interact()`;
-- an Inspector enum/dropdown selects the intended action, such as Join Game, Leave Game, Start Game or changing the match duration;
-- the button behaviour routes that selected action to the referenced manager or ball settings;
-- a new button can therefore be configured mainly through Inspector references instead of wiring a different public method for every button.
+- an Inspector enum/dropdown selects the intended action;
+- references determine which manager receives the action.
 
-This pattern is a strong candidate for a future reusable Sports Gym button prefab and, after separate design and testing, for Stefanie's Art House Cinema. It is not yet approved as a finished universal framework.
-
-## Missing from the basketball reference
-
-The existing package does not yet:
-
-- determine a winner when time expires;
-- display a winning player or team at match end;
-- play winner particles at match end;
-- provide a generic score interface for Soccer, Volleyball or Soccer Hockey.
-
-## Accepted first-release experience direction
-
-Stef selected **B — Registered players**.
-
-The first public-release design must therefore support:
-
-- players joining and leaving the match;
-- players being associated with a team;
-- player names being available for score and result presentation;
-- a match lasting about ten minutes;
-- score being kept during play;
-- winner presentation at the end;
-- a particle effect and cheering sound;
-- protection of the original basketball prefab.
-
-The exact winner text is not decided yet. For a team game it may need to show the winning team and one or more registered player names rather than claiming one individual always won.
+This pattern is accepted as a design reference for the Sports Gym. A universal Art House or general-purpose prefab remains later scope.
 
 ## Current architectural observation
 
-The basketball package provides useful proven patterns:
+The likely smallest safe architecture is:
 
-- one synchronized manager as truth;
-- network-time-based countdown instead of synchronizing every second;
-- buttons as input only;
-- UI as display only;
-- sport or goal logic reporting points to a manager;
-- serialization only when state changes;
-- one configurable button script using an Inspector action enum.
+- `SportsModeManager` remains the truth for Soccer versus Soccer Hockey;
+- one future generic match manager becomes the truth for registration, teams, timer, score and result;
+- two goal detectors only report which goal was entered;
+- configurable action buttons request Join Red, Join Blue, Leave and Start Game;
+- scoreboard visuals only display manager state.
 
-However, `BasketBallGrouping` is strongly basketball-specific and combines player registration, team assignment, score bookkeeping, timer, UI and overhead tags.
-
-A small independent generic match manager may be safer than forcing the basketball manager to control every sport. This is only a proposed direction and is not yet accepted.
+This is still a proposed architecture, not permission to build it yet.
 
 ## Current design question
 
-Decide this next, before discussing implementation:
+Decide this next before implementation:
 
-**How should registered players enter teams for the first public release?**
+**May players change teams after joining, and if so, until what moment?**
 
-- **A — Automatic balanced assignment:** players press Join; the system divides them between Red and Blue when the match starts.
-- **B — Manual team choice:** players explicitly press Join Red or Join Blue.
+Recommended simple rule:
 
-The basketball reference currently uses automatic assignment. Manual choice gives players control but needs extra rules for uneven or empty teams.
+- before the match: a player may switch by pressing the other team button;
+- once the match has started: team changes are locked until the match ends or is reset.
 
 Discuss only this question next.
 
@@ -181,43 +178,41 @@ Discuss only this question next.
 
 After the current question is resolved, discuss one at a time:
 
-1. Whether all sports use a fixed ten-minute duration.
-2. Which sports report scores automatically and which use manual controls.
-3. What happens on a draw.
-4. Whether changing sport mode cancels and resets the active match.
-5. Who may start, reset or edit a match.
-6. How late joiners see the active match and result.
-7. How the winning team and registered player names are presented.
-8. Whether the configurable action-button pattern becomes a separate generic prefab now or later.
+1. Whether a match may start with one team empty.
+2. What happens on a draw.
+3. Whether changing between Soccer and Soccer Hockey cancels and resets an active match.
+4. Who may start or reset a match.
+5. Exact goal anti-double-score behaviour.
+6. Ball reset behaviour after a goal.
+7. Exact winner text and how registered player names are shown.
+8. Whether team membership persists after a completed match.
 
 ## Risks
 
 - Damaging or tightly coupling to the protected basketball prefab.
 - Creating a second source of truth for the active sport mode.
-- Copying basketball-specific complexity into every sport.
-- Mixing UI state with match state.
-- Networking that fails for late joiners or after ownership changes.
-- Manual team choice allowing heavily uneven teams without clear rules.
-- Turning the generic button idea into an oversized framework before the Sports Gym release.
-- Expanding scope and delaying a nearly finished world.
+- Letting goal detectors keep independent scores.
+- Double-scoring while the ball remains in or bounces through a goal trigger.
+- Team switching during play making the winner list unreliable.
+- Networking that fails for late joiners, rejoining players or after ownership changes.
+- Turning the reusable button idea into an oversized framework before release.
+- Expanding scope beyond the two games that currently need completion.
 
 ## Exact next step for Stef
 
-Answer only the current design question:
+Answer only this design question:
 
-For registered players, choose between:
-
-- **A — Automatic balanced assignment** when the match starts; or
-- **B — Manual Join Red / Join Blue buttons**.
+- may players switch between Red and Blue before the match starts;
+- and should team switching lock as soon as Start Game is pressed?
 
 No Unity changes are needed for this step.
 
 ## Do not do yet
 
-- Do not create a generic MatchManager or ScoreManager.
+- Do not create the generic match manager yet.
+- Do not create goal trigger objects yet.
 - Do not edit the basketball scripts or prefabs.
 - Do not create the universal button prefab yet.
 - Do not connect score buttons.
 - Do not add synchronized variables.
 - Do not alter the Unity hierarchy.
-- Do not decide automatic score adapters yet.
