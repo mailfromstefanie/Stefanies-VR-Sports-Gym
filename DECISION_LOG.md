@@ -58,7 +58,7 @@ When the football enters Red's goal, Blue receives one point. When it enters Blu
 
 **Reason:** This matches normal goal-sport expectations and allows Soccer and Soccer Hockey to share the same scoring system.
 
-**Boundary:** Trigger details, anti-double-score protection and ball reset behaviour are not yet final and must be prototyped later.
+**Boundary:** Trigger details and anti-double-score protection must still be prototyped.
 
 ## D-009 — Shared match state supports late join and rejoin
 **Status:** Accepted at architecture-intent level
@@ -67,7 +67,7 @@ The future match manager must synchronize state changes such as registration, te
 
 **Reason:** Every player must see the same score, teams, remaining time and match status.
 
-**Boundary:** Exact synced fields and ownership handling will be chosen during architecture design, not during the current interaction-design step.
+**Boundary:** Exact synced fields and ownership handling will be chosen during architecture design.
 
 ## D-010 — Match remains active across Soccer and Soccer Hockey switching
 **Status:** Accepted
@@ -88,7 +88,7 @@ When `Start Game` is pressed, Red and Blue lock. While locked, new players canno
 
 Only a player who is already registered in Red or Blue may toggle `Allow Team Switching` during an active match. A spectator or late visitor who is not part of either team cannot open the teams.
 
-**Reason:** The people already playing control whether the running match admits or moves players. This keeps the system social without allowing an outsider to disrupt the match.
+**Reason:** The people already playing control whether the running match admits or moves players.
 
 **Boundary:** Any registered player may operate the control; there is no separate captain role in the first release.
 
@@ -96,8 +96,6 @@ Only a player who is already registered in Red or Blue may toggle `Allow Team Sw
 **Status:** Accepted
 
 `Start Game` succeeds only when Red has at least one registered player and Blue has at least one registered player. If either team is empty, the manager refuses to start the match and shows a short status message.
-
-**Reason:** This prevents accidental empty or one-sided matches and makes the start condition clear to everyone.
 
 **Preferred status text:** `Both teams need a player`.
 
@@ -108,18 +106,12 @@ When the countdown reaches zero and Red and Blue have equal scores, the timer st
 
 **Reason:** Stef prefers a decisive and exciting finish instead of a draw.
 
-**Boundary:** During sudden death, normal goal validation and anti-double-score protection still apply. The winner presentation plays only after the deciding goal is accepted.
-
 ## D-015 — Shared announcement panel for match messages
 **Status:** Accepted
 
 The large extra text field above the scoreboard becomes the central announcement panel for important shared match messages. It can show countdown or phase messages, start warnings, validation errors, team-lock status, sudden death and the final winner.
 
 At normal time expiry, a buzzer plays. If the score is tied, the timer remains at `00:00` and the announcement panel shows `NEXT GOAL WINS`, preferably with a restrained blinking or pulsing effect until the deciding goal is accepted.
-
-**Reason:** Players should understand the current match state immediately without needing to know hidden rules.
-
-**Boundary:** The final list of messages, animation timing and audio clips will be defined during UI and implementation design.
 
 ## D-016 — Registered players control Start and Reset
 **Status:** Accepted
@@ -128,6 +120,13 @@ When one or more players are registered, only a player currently registered in R
 
 When no players are registered at all, any visitor may use Reset Game or other setup controls needed to return the board to a clean waiting state. `Start Game` still cannot begin until both Red and Blue contain at least one registered player.
 
-**Reason:** Active participants should control their own match, while an abandoned or unused board must never become permanently locked for later visitors.
-
 **Boundary:** Reset Game still needs a deliberate confirmation or hold interaction to reduce accidental resets.
+
+## D-017 — Valid goals automatically reset the football to centre
+**Status:** Accepted
+
+After every accepted goal, the football automatically returns to the centre spot for a new kickoff. Further goal detection is temporarily blocked until the reset is complete.
+
+**Reason:** This gives players a clear restart, prevents the ball from bouncing inside the goal and being counted twice, and removes the need for a separate respawn action after every score.
+
+**Boundary:** The exact ownership transfer, Rigidbody reset, delay and goal-detector lockout will be chosen and tested during architecture and prototype work.
