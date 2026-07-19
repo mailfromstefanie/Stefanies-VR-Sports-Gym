@@ -119,32 +119,49 @@ Stef has already created the main layout:
 - Join Blue;
 - Leave Game;
 - Reset Game;
-- manual score correction controls.
+- manual score correction controls;
+- one large extra announcement text field above the scoreboard.
 
 The UI should display manager state and should not store independent game state.
+
+### Announcement panel and end-of-time flow
+
+The large upper text field becomes the central shared announcement panel.
+
+It may display:
+
+- short countdown or phase messages;
+- start refusal messages;
+- team-lock or team-open messages;
+- sudden-death status;
+- winner text.
+
+Accepted end-of-time behaviour:
+
+1. At `00:00`, play a buzzer sound.
+2. If one team leads, finish the match and show the winner.
+3. If the score is tied, keep the timer at `00:00`.
+4. Set the shared match state to sudden death.
+5. Show `NEXT GOAL WINS` in the announcement panel.
+6. The message may blink or pulse in a restrained way.
+7. Keep the message visible until the next valid goal ends the match.
+8. Late joiners during sudden death must immediately see the same message and state.
 
 ## Likely smallest architecture
 
 Proposed, not yet approved for implementation:
 
 - `SportsModeManager` remains the sport-mode truth.
-- One generic match manager becomes truth for registered players, teams, team lock, timer, score, sudden-death state and result.
+- One generic match manager becomes truth for registered players, teams, team lock, timer, score, announcement state, sudden-death state and result.
 - Two goal detectors report only which goal the football entered.
 - One configurable action-button behaviour requests actions such as Join Red, Join Blue, Leave, Start, Reset and Allow Team Switching.
-- Scoreboard visuals only render manager state.
+- Scoreboard visuals and the announcement panel only render manager state.
 
 ## Current design question
 
 Decide this next:
 
 **Who may press `Start Game` and `Reset Game`?**
-
-Small options:
-
-- any visitor;
-- any registered Red or Blue player;
-- only the player who currently owns the match manager;
-- only instance master or configured admins.
 
 Recommended first-release rule:
 
@@ -162,8 +179,9 @@ After the current question is resolved, discuss one at a time:
 3. Exact winner text and player-name presentation.
 4. Whether team membership persists after a completed match.
 5. Whether Reset Game needs confirmation.
-6. How the UI visually shows locked, open and sudden-death states.
+6. How the UI visually shows locked and open teams.
 7. Whether No Limit remains in the first release.
+8. Exact announcement-panel messages and timing.
 
 ## Risks
 
@@ -174,6 +192,7 @@ After the current question is resolved, discuss one at a time:
 - Outsiders disrupting a running match.
 - Networking failures for late join, rejoin or ownership transfer.
 - Accidental resets.
+- The announcement panel showing a local message that disagrees with shared match state.
 - Expanding the reusable button idea into an oversized framework before release.
 
 ## Exact next step for Stef
