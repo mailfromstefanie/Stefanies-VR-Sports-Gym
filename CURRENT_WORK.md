@@ -1,95 +1,201 @@
 # Current Work
 
 ## Active feature
+
 `FEATURES/SCOREBOARD`
 
 ## Current phase
-Inventory
+
+Inventory and interaction design
+
+Do not start Unity implementation yet.
 
 ## Current milestone
-M1 — Inspect the existing sport-mode system, scoreboard UI and original basketball reference scene before choosing a scoreboard architecture.
+
+M1 — Understand the existing sport-mode system, scoreboard UI and protected basketball reference implementation before choosing the generic scoreboard architecture.
 
 ## Session goal
-Capture the real current setup and identify reusable basketball game logic without modifying the protected basketball prefab or prematurely building a second score system.
 
-## Confirmed
-- The repository exists at `mailfromstefanie/Stefanies-VR-Sports-Gym`.
-- The world targets VRChat using Unity 2022.3 LTS and UdonSharp.
-- Stef reports that the sport hall itself is nearly complete and mainly needs a simple scoreboard/game-round system before public release.
-- The current Unity-state evidence is stored under `CURRENT_UNITY_STATE/`:
-  - scripts in `CURRENT_UNITY_STATE/SCRIPTS/`;
-  - hierarchy screenshots in `CURRENT_UNITY_STATE/SCREENSHOTS/`.
-- The two existing sport-mode scripts are:
-  - `SportsModeManager.cs`;
-  - `SportsModeButton.cs`.
-- `SportsModeManager` is the shared source of truth for the active sport mode.
-- The active mode is manually synchronized through one `[UdonSynced]` integer.
-- A player who changes mode takes ownership of the manager object before serialization.
-- The manager supports Basketball, Soccer, Volleyball and Soccer Hockey.
-- The manager activates and deactivates sport-specific and shared object groups, changes the floor material and refreshes sport-button visuals.
-- `SportsModeButton` only sends mode-selection input to the manager and displays active/inactive button visuals.
-- This existing split follows the intended architecture: Manager = truth, Button = input, Visual = display.
-- A scoreboard UI already exists in the current scene and hierarchy screenshots have been archived, but its exact Text/TextMeshPro components and Inspector bindings are not yet confirmed.
-- The basketball package contains its own prefab and scripts. It is protected external/reference content and must not be edited or replaced casually.
-- Stef copied only the basketball scoreboard UI into the sport-hall scene.
-- The original basketball test scene and its dependencies are archived as read-only reference material at:
-  `REFERENCE_PACKAGES/Basketball/Basketball_TestScene_Inspection.unitypackage`
-- Stef's current desired experience is deliberately small in scope:
-  - a match of about 10 minutes;
-  - score tracking during the round;
-  - a clear winner at the end;
-  - a particle celebration and cheering sound.
-- Showing an individual winning player's name has been proposed, but is not yet approved because team membership and player registration may make this significantly more complex.
+Use confirmed evidence from the current Sports Gym setup and the basketball test package to define the smallest useful public-release match experience.
 
-## Not yet confirmed
-- The exact hierarchy and Inspector references for `SportsModeManager` and `SportsModeButton` in the live sport-hall scene.
-- Which Text or TextMeshPro components the copied scoreboard UI uses.
-- Which controls already exist on the copied scoreboard UI.
-- The internal architecture of the original basketball test scene.
-- Which basketball scripts own score, timer, player/team registration, winner selection, networking and presentation.
-- Whether the basketball package exposes safe public methods or values that the sport-hall scoreboard can read or call.
-- Whether any basketball logic can be reused across the other sports without coupling the entire world to the basketball prefab.
-- Whether the first public release uses teams/sides or named individual players.
-- What happens on a draw.
-- What happens to an active match when the sport mode changes.
-- Who may start, reset or operate a match.
-- Exact late-joiner and ownership behaviour for the future match state.
+## Confirmed current Sports Gym setup
 
-## Current problem
-The sport-mode architecture is now partly understood, but the basketball reference package has not yet been unpacked and inspected. Designing a new score or timer system before that inspection could duplicate working logic, create two sources of truth or require unsafe changes to a protected prefab.
+- Repository: `mailfromstefanie/Stefanies-VR-Sports-Gym`.
+- Platform: VRChat Worlds.
+- Unity: 2022.3 LTS.
+- Scripting: UdonSharp.
+- Stef reports that the sports hall and sport games are nearly complete.
+- Existing sport modes are Basketball, Soccer, Volleyball and Soccer Hockey.
+- Current scripts are stored under `CURRENT_UNITY_STATE/SCRIPTS/`.
+- Current hierarchy screenshots are stored under `CURRENT_UNITY_STATE/SCREENSHOTS/`.
+- The current score-board UI already exists in the Sports Gym but is not yet connected to a final generic match system.
 
-## Open questions
-1. Which scenes, prefabs and scripts are actually contained in `Basketball_TestScene_Inspection.unitypackage`?
-2. Which component is the source of truth for basketball score and match time?
-3. How does the basketball package identify players, teams and a winner?
-4. Which parts can be reused or observed without modifying the basketball prefab?
-5. What controls and text fields already exist in Stef's copied scoreboard UI?
-6. Should the first release show Team/Side A versus Team/Side B, or individual player names?
-7. What should happen when the active sport mode changes during or after a match?
-8. Who may operate start, reset and score controls?
+## Confirmed sport-mode architecture
 
-Discuss or inspect one question at a time.
+### `SportsModeManager.cs`
+
+- Uses manual Udon synchronization.
+- Holds the synchronized active sport-mode index.
+- Supports four sport modes.
+- Takes ownership before a player changes the active mode.
+- Activates and deactivates sport-specific and shared object groups.
+- Changes the sports-floor material.
+- Refreshes sport-button visuals.
+- Is the existing shared source of truth for the selected sport mode.
+
+### `SportsModeButton.cs`
+
+- Sends a selected mode index to `SportsModeManager`.
+- Reads the current mode from the manager to refresh its sprite.
+- Does not store an independent copy of the active sport mode.
+
+This existing system follows:
+
+- Manager = truth
+- Button = input
+- Visual = display
+
+Do not replace it without a separate accepted decision.
+
+## Protected basketball reference package
+
+Stored at:
+
+`REFERENCE_PACKAGES/Basketball/Basketball_TestScene_Inspection.unitypackage`
+
+Detailed read-only findings are stored at:
+
+`REFERENCE_PACKAGES/Basketball/ANALYSIS.md`
+
+The original basketball test scene, prefabs and scripts are protected reference material. Stef copied only UI elements into the Sports Gym. Do not modify the original basketball package.
+
+## Confirmed basketball reference behaviour
+
+The package contains a full basketball test scene and the main scripts:
+
+- `BasketBallGrouping.cs`
+- `BasketBallGoal.cs`
+- `BasketBallButtons.cs`
+- `BasketBallBall.cs`
+- `BasketBallPickup.cs`
+- `BasketBallBlock.cs`
+
+### Existing match features
+
+`BasketBallGrouping` already implements:
+
+- a default ten-minute match;
+- configurable match duration;
+- Join and Leave registration;
+- automatic random Red and Blue team assignment on match start;
+- synchronized player IDs and team assignments;
+- individual player score bookkeeping;
+- calculated team totals;
+- TextMeshPro player names and scores;
+- a synchronized start timestamp based on VRChat network time;
+- a locally reconstructed countdown;
+- finish audio when time expires;
+- late-join serialization support;
+- overhead team tags.
+
+### Existing scoring features
+
+`BasketBallGoal` already implements:
+
+- validated hoop entry;
+- ownership checks;
+- one-, two- and three-point basketball scoring;
+- score assignment to the shooter's team;
+- goal particles;
+- goal audio;
+- synchronized goal effects.
+
+### Missing from the basketball reference
+
+The existing package does not yet:
+
+- determine a winner when time expires;
+- display a winning player or team at match end;
+- play winner particles at match end;
+- provide a generic score interface for Soccer, Volleyball or Soccer Hockey.
+
+## Stef's desired simple experience
+
+Provisional intent, not yet final architecture:
+
+- a match lasts about ten minutes;
+- score is kept during play;
+- the winner is announced at the end;
+- a particle effect plays;
+- a cheering sound plays;
+- the system should remain as simple as reasonably possible;
+- the original basketball prefab must not be damaged.
+
+Player-name presentation is still an open design choice because some sports may be played by teams rather than one individual winner.
+
+## Current architectural observation
+
+The basketball package provides useful proven patterns:
+
+- one synchronized manager as truth;
+- network-time-based countdown instead of synchronizing every second;
+- buttons as input only;
+- UI as display only;
+- sport or goal logic reporting points to a manager;
+- serialization only when state changes.
+
+However, `BasketBallGrouping` is strongly basketball-specific and combines player registration, team assignment, score bookkeeping, timer, UI and overhead tags.
+
+A small independent generic match manager may be safer than forcing the basketball manager to control every sport. This is only a proposed direction and is not yet accepted.
+
+## Current design question
+
+Decide this first, before discussing implementation:
+
+**For the first public release, does the score system need registered players and individual names, or is a simpler Left Team versus Right Team match sufficient?**
+
+This choice determines whether player registration and team assignment are necessary at all.
+
+Discuss only this question next.
+
+## Remaining open questions
+
+After the current question is resolved, discuss one at a time:
+
+1. How players join or choose a team, if registration is needed.
+2. Whether all sports use a fixed ten-minute duration.
+3. Which sports report scores automatically and which use manual controls.
+4. What happens on a draw.
+5. Whether changing sport mode cancels and resets the active match.
+6. Who may start, reset or edit a match.
+7. How late joiners see the active match and result.
 
 ## Risks
-- Modifying or breaking the original basketball prefab and package logic.
-- Creating a second source of truth for basketball score or match time.
-- Coupling every sport to basketball-specific scripts.
+
+- Damaging or tightly coupling to the protected basketball prefab.
+- Creating a second source of truth for the active sport mode.
+- Copying basketball-specific complexity into every sport.
 - Mixing UI state with match state.
-- Networking that fails for late joiners, ownership transfer or a departing master.
-- Adding player-name and team-registration complexity before the basic round works.
+- Networking that fails for late joiners or after ownership changes.
+- Adding player registration when a simpler team scoreboard would be enough.
 - Expanding scope and delaying a nearly finished world.
 
-## Exact next step for Nova
-Inspect `REFERENCE_PACKAGES/Basketball/Basketball_TestScene_Inspection.unitypackage` as read-only reference material. Produce an inventory of contained scenes, prefabs and scripts, then identify the likely score, timer, player/team, networking and winner-presentation responsibilities. Do not propose Unity implementation until this inspection is complete.
-
 ## Exact next step for Stef
-Do not change the basketball prefab, scoreboard hierarchy or sport-mode scripts while the reference package is being inspected. No additional upload is needed unless the package proves incomplete.
+
+Answer only the current design question:
+
+For the first public release, choose between:
+
+- **A — Simple team match:** Left Team versus Right Team, without registering individual players; or
+- **B — Registered players:** players Join, receive or choose teams, and their names can be shown in the result.
+
+No Unity changes are needed for this step.
 
 ## Do not do yet
-- Do not create a new ScoreManager or MatchManager.
-- Do not connect scoreboard buttons.
-- Do not add new synced score or timer variables.
-- Do not replace or edit the basketball prefab scripts.
+
+- Do not create a generic MatchManager or ScoreManager.
+- Do not edit the basketball scripts or prefabs.
+- Do not connect score buttons.
+- Do not add synchronized variables.
 - Do not alter the Unity hierarchy.
-- Do not decide that individual player names are required for the first release.
-- Do not begin winner particles or sound implementation yet.
+- Do not decide automatic score adapters yet.
