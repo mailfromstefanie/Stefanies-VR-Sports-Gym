@@ -31,7 +31,6 @@ Inspect the first existing sport-mode script without editing it.
 - Added owner-only initial snapshot setup and one initial serialization request.
 
 ### Deliberately not built yet
-- No Unity GameObject or component was added.
 - No scoreboard button was connected.
 - No Join, Leave, score, timer, goal or reset action was implemented.
 - The SoccerBox football was not changed.
@@ -41,8 +40,15 @@ Inspect the first existing sport-mode script without editing it.
 - Unity and UdonSharp completed compilation successfully.
 - No red Console errors were reported.
 
+### Manager component test result
+- Stef created an empty GameObject named `SportsMatchManager` under `GlobalManagers`.
+- Transform remained at position `0,0,0`, rotation `0,0,0`, scale `1,1,1`.
+- The UdonSharp component was added successfully.
+- Inspector defaults were correct, including a 600-second match duration and manual synchronization.
+- A local Play Mode test produced no red Console errors.
+
 ### Learned
-The foundation script is syntactically valid in the current Unity 2022.3 LTS and UdonSharp project.
+The foundation script is syntactically valid, can be added to the hierarchy, and initializes locally without Console errors in the current Unity 2022.3 LTS and UdonSharp project.
 
 ### Next step
-Create one empty GameObject named `SportsMatchManager`, add the compiled component, inspect the default fields and perform a local initialization test before connecting any button.
+Add only the manager-side Join Red, Join Blue and Leave Game request methods, then compile again before creating any buttons or scoreboard view.
