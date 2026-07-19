@@ -12,7 +12,7 @@ Do not start Unity implementation yet.
 
 ## Current milestone
 
-M1 — Define the smallest reliable match system for Soccer and Soccer Hockey using the existing sport-mode system and protected basketball reference patterns.
+M1 — Define the smallest reliable shared match system for Soccer and Soccer Hockey.
 
 ## Session goal
 
@@ -25,14 +25,13 @@ Finish the first-release interaction design before choosing the generic match ar
 - Unity: 2022.3 LTS.
 - Scripting: UdonSharp.
 - The sports hall is nearly complete.
-- The current public-release scoreboard scope is now limited to two playable modes:
-  - Soccer;
-  - Soccer Hockey.
+- The current public-release scoreboard scope is limited to Soccer and Soccer Hockey.
 - Both modes use the same football and the same two goals.
-- Switching to Soccer Hockey changes the field setup and enables hockey sticks; players strike the football with the sticks.
+- The shared football and both goals are assigned under `Soccer Hockey Shared Objects` in `SportsModeManager`.
+- Switching to Soccer Hockey changes the field setup and enables hockey sticks, but does not replace the football or goals.
 - Current scripts are stored under `CURRENT_UNITY_STATE/SCRIPTS/`.
 - Current hierarchy screenshots are stored under `CURRENT_UNITY_STATE/SCREENSHOTS/`.
-- The current scoreboard UI already exists but is not yet connected to a final match system.
+- The scoreboard UI already exists but is not yet connected to a final match system.
 
 ## Confirmed sport-mode architecture
 
@@ -100,9 +99,13 @@ Only Soccer and Soccer Hockey need the new match system for the current release.
 Both use:
 
 - one shared football;
-- two goals;
+- two shared goals;
 - the same Red-versus-Blue match structure;
 - the same score manager and goal detection concept.
+
+The match system is independent from the visual sport-mode switch. Changing between Soccer and Soccer Hockey does not automatically cancel or reset a match because the ball, goals and scoring rules remain the same.
+
+Players reset the match deliberately through a separate Reset Game action.
 
 ### Team registration
 
@@ -118,7 +121,7 @@ The design must support:
 
 ### Match flow
 
-Provisional accepted direction:
+Accepted direction:
 
 1. Players choose Red or Blue.
 2. A Start Game action begins one shared ten-minute match.
@@ -128,7 +131,9 @@ Provisional accepted direction:
 6. When the ball enters Blue's goal, Red receives one point.
 7. The changed score is serialized when a goal is accepted.
 8. Late joiners and rejoining players receive the current shared match state through synchronized variables and deserialization.
-9. At time expiry, the winner is determined and presented with winner text, particles and cheering audio.
+9. Switching between Soccer and Soccer Hockey leaves the active match intact.
+10. A separate Reset Game action clears the match state when players choose to reset it.
+11. At time expiry, the winner is determined and presented with winner text, particles and cheering audio.
 
 ### Goal detection direction
 
@@ -154,9 +159,10 @@ This pattern is accepted as a design reference for the Sports Gym. A universal A
 The likely smallest safe architecture is:
 
 - `SportsModeManager` remains the truth for Soccer versus Soccer Hockey;
-- one future generic match manager becomes the truth for registration, teams, timer, score and result;
+- one future generic match manager becomes the independent truth for registration, teams, timer, score and result;
+- the match manager does not reset merely because the sport mode changes;
 - two goal detectors only report which goal was entered;
-- configurable action buttons request Join Red, Join Blue, Leave and Start Game;
+- configurable action buttons request Join Red, Join Blue, Leave, Start Game and Reset Game;
 - scoreboard visuals only display manager state.
 
 This is still a proposed architecture, not permission to build it yet.
@@ -180,12 +186,12 @@ After the current question is resolved, discuss one at a time:
 
 1. Whether a match may start with one team empty.
 2. What happens on a draw.
-3. Whether changing between Soccer and Soccer Hockey cancels and resets an active match.
-4. Who may start or reset a match.
-5. Exact goal anti-double-score behaviour.
-6. Ball reset behaviour after a goal.
-7. Exact winner text and how registered player names are shown.
-8. Whether team membership persists after a completed match.
+3. Who may start or reset a match.
+4. Exact goal anti-double-score behaviour.
+5. Ball reset behaviour after a goal.
+6. Exact winner text and how registered player names are shown.
+7. Whether team membership persists after a completed match.
+8. Whether Reset Game needs confirmation or restricted access.
 
 ## Risks
 
@@ -195,6 +201,7 @@ After the current question is resolved, discuss one at a time:
 - Double-scoring while the ball remains in or bounces through a goal trigger.
 - Team switching during play making the winner list unreliable.
 - Networking that fails for late joiners, rejoining players or after ownership changes.
+- Accidental resets by any player during an active match.
 - Turning the reusable button idea into an oversized framework before release.
 - Expanding scope beyond the two games that currently need completion.
 
