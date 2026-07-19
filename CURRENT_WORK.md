@@ -131,20 +131,32 @@ For every button action:
 - Late joiners immediately reconstruct the correct remaining time from the end timestamp.
 - When the countdown reaches zero, only the current `SportsMatchManager` owner changes the phase to `FINISHED` or `SUDDEN_DEATH` and serializes the result.
 
+### Approved goal validation and duplicate protection
+
+- Each `SportsGoalDetector` reacts only to the configured football.
+- It reports only which physical goal was entered and never changes the score itself.
+- The manager accepts a goal only during `PLAYING` or `SUDDEN_DEATH`.
+- On acceptance, the manager immediately changes phase to `GOAL_PAUSE` or `FINISHED` before starting presentation or reset work.
+- Any later trigger report while the manager is in another phase is ignored.
+- The detector must see the football leave its trigger before that same ball can produce another entry report.
+
+This provides two independent protections: local trigger re-entry protection and central match-phase protection.
+
 ## Current architecture question
 
-**How should a goal be validated and protected against counting twice?**
+**How should football ownership and the physical reset work after an accepted goal?**
 
 Recommended first-release rule:
 
-1. A goal detector reacts only to the configured football, not to players, sticks or other pickups.
-2. It reports only which physical goal was entered.
-3. The manager accepts the report only during `PLAYING` or `SUDDEN_DEATH`.
-4. On acceptance, the manager immediately changes phase to `GOAL_PAUSE` or `FINISHED` before doing presentation and ball reset work.
-5. Any further trigger reports while not in `PLAYING` or `SUDDEN_DEATH` are ignored.
-6. The detector should require the football to leave the goal trigger before it can report that same ball entering again.
+1. The player who successfully processes the goal becomes owner of both `SportsMatchManager` and the football.
+2. The football is forcibly dropped if someone is holding it.
+3. Its Rigidbody linear velocity and angular velocity are set to zero.
+4. The ball is moved to a configured centre anchor with a fixed reset rotation.
+5. During `GOAL_PAUSE`, the ball remains frozen and unavailable for about two seconds.
+6. At the shared goal-pause end time, the manager owner releases the freeze, changes the phase back to `PLAYING` and serializes once.
+7. A sudden-death winning goal changes directly to `FINISHED`; the ball may remain frozen at centre until Reset Game.
 
-This gives two layers of protection: the detector blocks repeated trigger spam, and the manager phase blocks any duplicate score globally.
+The exact Unity components on the current football must be inspected before implementation. This decision approves the behaviour, not a specific script call yet.
 
 Discuss only this decision next.
 
@@ -152,10 +164,9 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. football ownership, reset and Rigidbody handling;
-2. announcements, audio and particle event reconstruction;
-3. configurable button actions and automatic view refresh;
-4. smallest build-and-test order.
+1. announcements, audio and particle event reconstruction;
+2. configurable button actions and automatic view refresh;
+3. smallest build-and-test order.
 
 ## Do not do yet
 
