@@ -6,13 +6,13 @@
 
 ## Current phase
 
-Implementation — microstep 3 team registration methods.
+Implementation — microstep 4 player-list rendering.
 
 The first-release interaction design and technical architecture are approved.
 
 ## Current milestone
 
-M3 — Introduce and verify the smallest working `SportsMatchManager` foundation before connecting UI.
+M3 — Verify local team registration and begin the smallest synchronized scoreboard view.
 
 ## Confirmed project setup
 
@@ -35,7 +35,7 @@ M3 — Introduce and verify the smallest working `SportsMatchManager` foundation
 - Football reset must preserve SoccerBox, `SBBall`, `BallTrigger` and the existing Rigidbody physics.
 - Persistent announcements and winner particles reconstruct for late joiners.
 - One-shot audio is played only for newly received events.
-- `SportsMatchButton` will use an Inspector-selected action and keep no match state.
+- `SportsMatchButton` uses an Inspector-selected integer action and keeps no match state.
 - `SportsScoreboardView` will render all texts and visuals from manager state.
 
 ## Completed microsteps
@@ -44,28 +44,34 @@ M3 — Introduce and verify the smallest working `SportsMatchManager` foundation
 - Empty `SportsMatchManager` GameObject created under `GlobalManagers`.
 - Transform and Inspector defaults verified.
 - Local Play Mode initialization test completed with no red Console errors.
+- Manager-side Join Red, Join Blue and Leave Game logic added and compiled.
+- `SportsMatchButton.cs` added and corrected for the installed UdonSharp version.
+- Temporary Inspector debug fields added.
+- Local ClientSim test passed:
+  - Join Red: local team `1`, Red `1`, Blue `0`;
+  - Join Blue: local team `2`, Red `0`, Blue `1`;
+  - Leave Game: `0, 0, 0`.
 
 ## Current microstep
 
-Add only manager-side methods for:
+Create only the first minimal `SportsScoreboardView` that:
 
-1. Join Red;
-2. Join Blue;
-3. Leave Game;
-4. player lookup and empty-slot handling;
-5. accepted-action ownership and one serialization request.
-
-Do not create buttons or scoreboard visuals yet. Compile this manager-only change first.
+1. references `SportsMatchManager`;
+2. references one Red-team text and one Blue-team text;
+3. converts synchronized player IDs into current display names;
+4. refreshes after startup and manager state changes;
+5. contains no score, timer, winner, lock or announcement rendering yet.
 
 ## Pass condition
 
-- Unity and UdonSharp compile the updated manager without red errors.
-- Existing scene behaviour remains unchanged because no UI is connected.
-- No football, goal, timer, score or sport-mode object is modified.
+- Unity and UdonSharp compile the view without red errors.
+- In ClientSim, joining Red shows the local display name only in the Red text.
+- Switching to Blue removes the name from Red and shows it only in Blue.
+- Leaving clears both texts.
 
 ## Not implemented yet
 
-- no buttons or scoreboard view;
+- no two-client synchronization test;
 - no score or timer behaviour;
 - no goals or goal triggers;
 - no reset confirmations;
