@@ -149,3 +149,26 @@ The synchronized player-ID arrays form a sufficient reconstructable snapshot for
 
 ### Next step
 Test instance departure cleanup and ownership continuity: close a registered manager owner, verify that the departed name is removed, and confirm the remaining clients can still Join, Switch and Leave.
+
+## 2026-07-19 — Registered-player departure cleanup passed
+
+### Test setup
+- Multiple clients were registered in Red and Blue.
+- The client that currently owned `SportsMatchManager` was closed while still registered.
+
+### Results
+- The departed player's name disappeared from the remaining clients.
+- The other registered player remained visible.
+- Ownership or master transfer did not freeze the manager.
+- A remaining client could still Join, Switch and Leave afterward.
+- No duplicate registration or stale departed-player name was observed.
+
+### Learned
+`OnPlayerLeft` cleanup, ownership continuity and manual serialization remain reliable when the registered manager owner leaves the instance. The registration subsystem has now passed local, two-client, late-joiner and departure tests.
+
+### Deliberately not built yet
+- No score-changing controls.
+- No timer, goals, reset confirmation, audio, particles or SoccerBox football changes.
+
+### Next step
+Begin the smallest score-display step: connect the existing Red and Blue score TMP texts to `SportsScoreboardView` and render the manager's current synchronized score values without adding score-changing actions yet.
