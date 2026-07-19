@@ -101,3 +101,28 @@ The button-manager-view chain works locally: buttons forward requests, the manag
 
 ### Next step
 Run the first two-client synchronization test for Join Red, Join Blue, team switching and Leave Game without adding new match features.
+
+## 2026-07-19 — Two-client team synchronization passed
+
+### Test setup
+- Started two ClientSim clients.
+- Client A joined Red.
+- Client B joined Blue.
+
+### Results
+- Both clients showed identical Red and Blue player lists.
+- Client A switched from Red to Blue and both clients updated correctly.
+- Client B remained registered while client A switched.
+- Client A then used Leave Game and disappeared from both clients.
+- Client B remained visible in Blue on both clients.
+- No duplicate registration or accidental removal of the other player was observed.
+
+### Learned
+Ownership transfer and manual serialization are working for Join, Switch and Leave across two clients. The manager remains the only shared source of truth and each view reconstructs the same team lists after deserialization.
+
+### Deliberately not built yet
+- No completed late-joiner reconstruction test.
+- No score, timer, goals, reset confirmation, audio, particles or SoccerBox football changes.
+
+### Next step
+Run a three-client late-joiner test: register two players first, then add a third client and verify that it reconstructs both existing team lists without anyone pressing Join again.
