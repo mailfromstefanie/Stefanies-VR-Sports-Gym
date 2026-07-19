@@ -123,17 +123,28 @@ For every button action:
 - A player leaving never resets or cancels the whole match automatically.
 - If one team becomes empty during an active match, the match continues until players deliberately reset it.
 
+### Approved synchronized countdown
+
+- Starting a match synchronizes one network end timestamp.
+- Every client calculates the displayed remaining time locally from that same timestamp.
+- The timer is not serialized every second.
+- Late joiners immediately reconstruct the correct remaining time from the end timestamp.
+- When the countdown reaches zero, only the current `SportsMatchManager` owner changes the phase to `FINISHED` or `SUDDEN_DEATH` and serializes the result.
+
 ## Current architecture question
 
-**How should the synchronized countdown work for all players and late joiners?**
+**How should a goal be validated and protected against counting twice?**
 
 Recommended first-release rule:
 
-- when the match starts, synchronize one network end timestamp;
-- every client calculates the remaining time locally from that same timestamp;
-- do not synchronize the timer every second;
-- when time reaches zero, only the current manager owner changes the phase to `FINISHED` or `SUDDEN_DEATH` and serializes that result;
-- late joiners immediately calculate the correct remaining time from the shared end timestamp.
+1. A goal detector reacts only to the configured football, not to players, sticks or other pickups.
+2. It reports only which physical goal was entered.
+3. The manager accepts the report only during `PLAYING` or `SUDDEN_DEATH`.
+4. On acceptance, the manager immediately changes phase to `GOAL_PAUSE` or `FINISHED` before doing presentation and ball reset work.
+5. Any further trigger reports while not in `PLAYING` or `SUDDEN_DEATH` are ignored.
+6. The detector should require the football to leave the goal trigger before it can report that same ball entering again.
+
+This gives two layers of protection: the detector blocks repeated trigger spam, and the manager phase blocks any duplicate score globally.
 
 Discuss only this decision next.
 
@@ -141,11 +152,10 @@ Discuss only this decision next.
 
 Review one at a time:
 
-1. goal validation and anti-double-score flow;
-2. football ownership, reset and Rigidbody handling;
-3. announcements, audio and particle event reconstruction;
-4. configurable button actions and automatic view refresh;
-5. smallest build-and-test order.
+1. football ownership, reset and Rigidbody handling;
+2. announcements, audio and particle event reconstruction;
+3. configurable button actions and automatic view refresh;
+4. smallest build-and-test order.
 
 ## Do not do yet
 
