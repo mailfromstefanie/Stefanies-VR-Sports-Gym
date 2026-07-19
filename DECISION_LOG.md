@@ -98,3 +98,12 @@ The final shared announcement is only `RED TEAM WINS` or `BLUE TEAM WINS`. Do no
 **Reason:** Stef wants the ending bold, immediate and uncluttered. Registered names remain visible in the normal Red and Blue team lists.
 
 **Presentation:** Play cheering audio and the winning team's particles. Keep the winner message visible until Reset Game.
+
+## D-020 — Team membership persists after the result
+**Status:** Accepted
+
+Players remain registered in Red or Blue after a match finishes. Preparing a rematch clears the score, timer, sudden-death state, announcements and result, but keeps both team lists intact.
+
+Players leave through `Leave Game` or change team only while team switching is allowed. A separate full cleanup may clear all registrations when the group deliberately wants new teams or when an abandoned board must be restored.
+
+**Reason:** The same group can start a rematch without everyone having to join again.
