@@ -233,3 +233,12 @@ The scoreboard does not replace or reconfigure the SoccerBox football, `SBBall`,
 After an accepted goal, the processor takes ownership of the football root, clears linear and angular velocity, moves it to the centre anchor and sends the reset through the existing `SBBall` synchronization path. The goal pause temporarily blocks scoring and interaction without permanently changing the established football physics.
 
 The exact script calls and safest temporary blocking method must be proven in a small isolated test before modifying the working football.
+
+## D-035 — Persistent presentation reconstructs; old one-shot audio does not replay
+**Status:** Accepted
+
+Persistent announcement text is rebuilt from synchronized manager state, so late joiners immediately see states such as `NEXT GOAL WINS` and the final winning-team message.
+
+Goal sounds, the end buzzer and cheering use an incrementing synchronized event sequence so current players play each newly received event once. A late joiner does not replay old audio merely because they entered later.
+
+Winner particles reconstruct from `FINISHED` and the winner team and remain visible until Reset Game.
