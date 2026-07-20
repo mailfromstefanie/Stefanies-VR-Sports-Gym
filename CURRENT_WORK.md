@@ -4,11 +4,15 @@
 
 `FEATURES/SCOREBOARD`
 
+Feature entry point: `FEATURES/SCOREBOARD/00_START_HERE.md`
+
 ## Current phase
 
 Implementation — microstep 8 minimal synchronized score rendering.
 
 The first-release interaction design and technical architecture are approved.
+
+Implementation still means: explain one small step, give exactly one action, stop, and wait for Stef's observed result before continuing.
 
 ## Current milestone
 
@@ -113,3 +117,15 @@ This step must not yet:
 - no reset confirmations;
 - no audio or particles;
 - no SoccerBox football changes.
+
+## New-chat collaboration gate
+
+Before acting, read `COLLABORATION_RULES.md`.
+
+For this implementation phase:
+
+1. explain the purpose of the next action in plain Dutch;
+2. give exactly one small action;
+3. wait for Stef's compile, screenshot, Console, ClientSim or VRChat result;
+4. do not continue automatically;
+5. do not mark the microstep complete until the full pass condition has been observed.
