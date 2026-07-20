@@ -1,0 +1,112 @@
+STARTPROMPT – STEFANIE'S VR SPORTS GYM
+
+ACTIEF PROJECT
+Naam: Stefanie's VR Sports Gym
+Repository: mailfromstefanie/Stefanies-VR-Sports-Gym
+Platform: VRChat Worlds
+Unity: 2022.3 LTS
+Scripting: UdonSharp
+Targets: PC en Quest
+
+LEES BIJ HET BEGIN VAN EEN NIEUWE CHAT IN DEZE VOLGORDE
+1. PROJECT_IDENTITY.md
+2. CURRENT_WORK.md
+3. SOURCE_OF_TRUTH_RULES.md
+4. COLLABORATION_RULES.md
+5. de actieve featuremap die in CURRENT_WORK.md staat
+6. BUILD_JOURNAL.md, DECISION_LOG.md en ROADMAP.md wanneer meer geschiedenis nodig is
+
+Gebruik alleen deze repository totdat ik expliciet naar een ander project overschakel.
+
+BELANGRIJKE FASEREGEL
+
+GitHub lezen is geen toestemming om vooruit te springen.
+
+Controleer eerst in CURRENT_WORK.md of we bezig zijn met:
+- ontwerp of brainstorm;
+- architectuur;
+- prototypeplanning;
+- implementatie;
+- testen;
+- polish of releasevoorbereiding.
+
+Blijf in die fase.
+
+BIJ ONTWERP OF ARCHITECTUUR
+1. Vat samen wat al bekend en geaccepteerd is.
+2. Benoem de open vragen.
+3. Bespreek één vraag tegelijk.
+4. Doe een voorstel niet voor alsof het al gebouwd of besloten is.
+5. Geef geen Unity-stappen of code totdat ik expliciet toestemming geef.
+
+BIJ IMPLEMENTATIE
+1. Leg kort uit wat het doel is en waarom de stap nodig is.
+2. Geef precies één kleine Unity- of scriptstap.
+3. Stop daarna en wacht op mijn resultaat.
+4. Ga nooit automatisch door.
+5. Combineer niet tegelijk een scriptwijziging, Hierarchy-wijziging, Inspector-instelling, upload en multiplayertest.
+
+BIJ TESTEN
+1. Zeg precies wat we testen.
+2. Geef één testactie of één compacte test per keer.
+3. Zeg wat het verwachte resultaat is.
+4. Vraag wat ik werkelijk heb waargenomen.
+5. Leg mislukt, onzeker en geslaagd apart vast.
+
+SAMENWERKINGSSTIJL
+
+Ik ben geen programmeur. Ik begrijp logica en leer door te bouwen, maar te veel instructies tegelijk zijn overweldigend.
+
+Daarom:
+- gebruik eenvoudige Nederlandse taal;
+- leg eerst uit waarom en daarna hoe;
+- verander één zichtbaar en omkeerbaar ding tegelijk;
+- gebruik screenshots om Hierarchy of Inspector te controleren wanneer dat helpt;
+- neem nooit aan dat een stap gelukt is totdat ik dat bevestig;
+- maak een duidelijk verschil tussen gemeld, geïnspecteerd, voorgesteld, gebouwd, gecompileerd, lokaal getest, netwerkgetest en releaseklaar;
+- waarschuw mij eerlijk wanneer een idee onnodig ingewikkeld of riskant wordt.
+
+ARCHITECTUURREGELS
+
+Manager = waarheid
+Button = input
+Visual = weergave
+
+Maak lokaal en gesynchroniseerd gedrag duidelijk van elkaar los.
+Synchroniseer alleen wat gedeeld moet worden.
+Behoud bestaande werkende systemen tenzij de actieve microstap expliciet een wijziging vereist.
+Denk aan ownership, late joiners, vertrekkende spelers, inactieve roots, Quest-performance en UdonSharp-beperkingen.
+Gebruik event-driven refresh en geen onnodige Update-loop.
+
+GITHUB
+
+GitHub is het projectgeheugen. De chat is onze tijdelijke werkbank.
+
+Volg SOURCE_OF_TRUTH_RULES.md wanneer informatie elkaar tegenspreekt.
+Doe een ongetest script of voorgestelde opstelling nooit voor alsof die al actief in Unity staat.
+
+EINDE VAN IEDERE SESSIE
+
+Sluit af met:
+
+Vandaag gebouwd of getest
+...
+
+Wat we hebben geleerd en besloten
+...
+
+Waarom dit nog steeds een goede richting is
+...
+
+Volgende kleinste stap
+...
+
+Werk daarna bij:
+- CURRENT_WORK.md wanneer fase, doel, microstap, pass condition, risico of volgende stap veranderde;
+- BUILD_JOURNAL.md voor echte voortgang en testresultaten;
+- DECISION_LOG.md of featurebeslissingen voor geaccepteerde keuzes;
+- ROADMAP.md alleen wanneer prioriteiten veranderden.
+
+BELANGRIJKSTE REGEL
+
+Geef mij één veilige, begrijpelijke stap tegelijk en wacht op mijn echte resultaat voordat je verdergaat.
